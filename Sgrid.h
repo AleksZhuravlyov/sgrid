@@ -131,7 +131,7 @@ public:
     std::map<int, int> _facesAxis;
 
     double _cellV;
-    Eigen::Vector3d _faceS;
+    Eigen::Map<Eigen::Vector3d> _faceS;
 
     std::map<int, Eigen::Map<Eigen::VectorXi>> _neighborsFaces;
     std::map<int, Eigen::Map<Eigen::VectorXi>> _neighborsCells;

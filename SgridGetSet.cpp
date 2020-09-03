@@ -26,6 +26,11 @@
 
 namespace Eigen {
 
+    template<class T>
+    void setter(Eigen::Ref<T> &source, Eigen::Map<T> &sink) {
+        new(&sink) Eigen::Map<T>(source.data(), source.size());
+    };
+
     template<class K, class V>
     std::map<K, Eigen::Ref<V>> mapGetter(std::map<K, Eigen::Map<V>> &source) {
 
@@ -56,8 +61,7 @@ Eigen::Ref<Eigen::Vector3i> Sgrid::getPointsDims() {
 }
 
 void Sgrid::setPointsDims(Eigen::Ref<Eigen::Vector3i> pointsDims) {
-    new(&_pointsDims) Eigen::Map<Eigen::Vector3i>(pointsDims.data(),
-                                                  pointsDims.size());
+    Eigen::setter<Eigen::Vector3i>(pointsDims, _pointsDims);
 }
 
 Eigen::Ref<Eigen::Vector3d> Sgrid::getPointsOrigin() {
@@ -65,8 +69,7 @@ Eigen::Ref<Eigen::Vector3d> Sgrid::getPointsOrigin() {
 }
 
 void Sgrid::setPointsOrigin(Eigen::Ref<Eigen::Vector3d> pointsOrigin) {
-    new(&_pointsOrigin) Eigen::Map<Eigen::Vector3d>(pointsOrigin.data(),
-                                                    pointsOrigin.size());
+    Eigen::setter<Eigen::Vector3d>(pointsOrigin, _pointsOrigin);
 }
 
 
@@ -75,7 +78,7 @@ Eigen::Ref<Eigen::Vector3d> Sgrid::getSpacing() {
 }
 
 void Sgrid::setSpacing(Eigen::Ref<Eigen::Vector3d> spacing) {
-    new(&_spacing) Eigen::Map<Eigen::Vector3d>(spacing.data(), spacing.size());
+    Eigen::setter<Eigen::Vector3d>(spacing, _spacing);
 }
 
 
@@ -84,8 +87,7 @@ Eigen::Ref<Eigen::Vector3i> Sgrid::getCellsDims() {
 }
 
 void Sgrid::setCellsDims(Eigen::Ref<Eigen::Vector3i> cellsDims) {
-    new(&_cellsDims) Eigen::Map<Eigen::Vector3i>(cellsDims.data(),
-                                                 cellsDims.size());
+    Eigen::setter<Eigen::Vector3i>(cellsDims, _cellsDims);
 }
 
 
@@ -103,7 +105,7 @@ Eigen::Ref<Eigen::Vector3d> Sgrid::getFaceS() {
 }
 
 void Sgrid::setFaceS(Eigen::Ref<Eigen::Vector3d> faceS) {
-    new(&_faceS) Eigen::Map<Eigen::Vector3d>(faceS.data(), faceS.size());
+    Eigen::setter<Eigen::Vector3d>(faceS, _faceS);
 }
 
 
