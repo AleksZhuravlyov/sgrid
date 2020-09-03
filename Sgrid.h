@@ -128,6 +128,7 @@ public:
 
     std::map<int, Eigen::Map<Eigen::Vector3i>> _facesDims;
     int _facesN;
+    std::map<int, int> _facesAxis;
 
     double _cellV;
     Eigen::Vector3d _faceS;
@@ -155,6 +156,8 @@ public:
     void calculateFacesDims();
 
     void calculateFacesN();
+
+    void calculateFacesAxis();
 
     void calculateCellV();
 

@@ -63,10 +63,10 @@ PYBIND11_MODULE(sgrid_bind, m) {
             .def_property("faces_dims",
                           &Sgrid::getFacesDims, &Sgrid::setFacesDims)
             .def_readwrite("faces_N", &Sgrid::_facesN)
+            .def_readwrite("faces_axis", &Sgrid::_facesAxis)
 
             .def_readwrite("cell_V", &Sgrid::_cellV)
-            .def_property("face_S",
-                          &Sgrid::getFaceS, &Sgrid::setFaceS)
+            .def_property("face_S", &Sgrid::getFaceS, &Sgrid::setFaceS)
 
             .def_property("neighbors_faces",
                           &Sgrid::getNeighborsFaces, &Sgrid::setNeighborsFaces)
@@ -88,6 +88,6 @@ PYBIND11_MODULE(sgrid_bind, m) {
                           &Sgrid::getFacesArrays, &Sgrid::setFacesArrays);
 
     m.def("save_files_collection_to_file", &saveFilesCollectionToFile,
-          "file_name"_a,"files_names"_a,"files_descriptions"_a);
+          "file_name"_a, "files_names"_a, "files_descriptions"_a);
 }
 
