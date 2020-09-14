@@ -46,6 +46,11 @@ PYBIND11_MODULE(sgrid_bind, m) {
 
             .def("save", &Sgrid::save, "file_name"_a)
 
+            .def("calculate_i_cell", &Sgrid::calculateICell, "i_x"_a, "i_y"_a, "i_z"_a)
+            .def("calculate_i_x_cell", &Sgrid::calculateIXCell, "i_cell"_a)
+            .def("calculate_i_y_cell", &Sgrid::calculateIYCell, "i_cell"_a)
+            .def("calculate_i_z_cell", &Sgrid::calculateIZCell, "i_cell"_a)
+
 
             .def_property("points_dims",
                           &Sgrid::getPointsDims, &Sgrid::setPointsDims)
@@ -59,15 +64,15 @@ PYBIND11_MODULE(sgrid_bind, m) {
             .def_property("cells_dims",
                           &Sgrid::getCellsDims, &Sgrid::setCellsDims)
             .def_readwrite("cells_N", &Sgrid::_cellsN)
-            .def_property("active_cells",
-                          &Sgrid::getActiveCells, &Sgrid::setActiveCells)
+            .def_property("types_cells",
+                          &Sgrid::getTypesCells, &Sgrid::setTypesCells)
 
             .def_property("faces_dims",
                           &Sgrid::getFacesDims, &Sgrid::setFacesDims)
             .def_readwrite("faces_N", &Sgrid::_facesN)
             .def_readwrite("faces_axis", &Sgrid::_facesAxis)
-            .def_property("bound_faces",
-                          &Sgrid::getBoundFaces, &Sgrid::setBoundFaces)
+            .def_property("types_faces",
+                          &Sgrid::getTypesFaces, &Sgrid::setTypesFaces)
 
             .def_readwrite("cell_V", &Sgrid::_cellV)
             .def_property("face_S", &Sgrid::getFaceS, &Sgrid::setFaceS)

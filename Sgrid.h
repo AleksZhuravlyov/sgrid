@@ -69,10 +69,10 @@ public:
     void setCellsDims(Eigen::Ref<Eigen::Vector3i> cellsDims);
 
 
-    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getActiveCells();
+    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getTypesCells();
 
-    void setActiveCells(
-            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> activeCells);
+    void setTypesCells(
+            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesCells);
 
 
     std::map<int, Eigen::Ref<Eigen::Vector3i>> getFacesDims();
@@ -80,10 +80,10 @@ public:
     void setFacesDims(std::map<int, Eigen::Ref<Eigen::Vector3i>> facesDims);
 
 
-    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getBoundFaces();
+    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getTypesFaces();
 
-    void setBoundFaces(
-            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> boundFaces);
+    void setTypesFaces(
+            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesFaces);
 
 
     Eigen::Ref<Eigen::Vector3d> getFaceS();
@@ -137,13 +137,13 @@ public:
 
     Eigen::Map<Eigen::Vector3i> _cellsDims;
     int _cellsN;
-    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _activeCells;
+    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _typesCells;
 
 
     std::map<int, Eigen::Map<Eigen::Vector3i>> _facesDims;
     int _facesN;
     std::map<int, int> _facesAxis;
-    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _boundFaces;
+    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _typesFaces;
 
     double _cellV;
     Eigen::Map<Eigen::Vector3d> _faceS;
@@ -178,6 +178,14 @@ public:
 
     void calculateFaceS();
 
+    int calculateICell(const int &iX, const int &iY, const int &iZ);
+
+    int calculateIXCell(const int &iCell);
+
+    int calculateIYCell(const int &iCell);
+
+    int calculateIZCell(const int &iCell);
+
     void calculateNeighborsFaces();
 
     void calculateNeighborsCells();
@@ -185,6 +193,10 @@ public:
     void calculateNormalsNeighborsCells();
 
     void calculateNormalsNeighborsFaces();
+
+    void calculateMainTypesCells();
+
+    void calculateMainTypesFaces();
 
 
     void calculateGridProps();
@@ -196,5 +208,17 @@ public:
 void saveFilesCollectionToFile(const std::string &fileName,
                                const std::vector<std::string> &filesNames,
                                const std::vector<std::string> &filesDescriptions);
+
+template<class T>
+void copyStdVectotToEigenVector(
+        std::vector<T> &stdVector,
+        Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>>& eigenVector) {
+    auto size = stdVector.size();
+    delete[] eigenVector.data();
+    new(&eigenVector) Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>>(new T[size], size);
+    for (int i = 0; i < size; i++)
+        eigenVector(i) = stdVector[i];
+}
+
 
 #endif // SGRID_H

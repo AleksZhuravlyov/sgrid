@@ -95,6 +95,21 @@ void Sgrid::calculateFaceS() {
                              _spacing(0) * _spacing(1));
 }
 
+int Sgrid::calculateICell(const int &iX, const int &iY, const int &iZ) {
+    return iX + iY * _cellsDims(0) + iZ * _cellsDims(0) * _cellsDims(1);
+}
+
+int Sgrid::calculateIXCell(const int &iCell) {
+    return (iCell % (_cellsDims(0) * _cellsDims(1))) % _cellsDims(0);
+}
+
+int Sgrid::calculateIYCell(const int &iCell) {
+    return (iCell % (_cellsDims(0) * _cellsDims(1))) / _cellsDims(0);
+}
+
+int Sgrid::calculateIZCell(const int &iCell) {
+    return iCell / (_cellsDims(0) * _cellsDims(1));
+}
 
 void Sgrid::calculateNeighborsFaces() {
 
@@ -111,14 +126,15 @@ void Sgrid::calculateNeighborsFaces() {
         for (int j = 0; j < _cellsDims(1); ++j) {
             for (int i = 0; i < _cellsDims(0); ++i) {
 
-                auto iCell = i + j * _cellsDims(0) + k * _cellsDims(0) * _cellsDims(1);
+                auto iCell = calculateICell(i, j, k);
 
                 _neighborsFaces.at(iCell)(0) = iCell + offset0;
                 _neighborsFaces.at(iCell)(1) = iCell + 1 + offset0;
                 _neighborsFaces.at(iCell)(2) = iCell + offset1;
                 _neighborsFaces.at(iCell)(3) = iCell + _cellsDims(0) + offset1;
                 _neighborsFaces.at(iCell)(4) = iCell + offset2;
-                _neighborsFaces.at(iCell)(5) = iCell + _cellsDims(0) * _cellsDims(1) + offset2;
+                _neighborsFaces.at(iCell)(5) =
+                        iCell + _cellsDims(0) * _cellsDims(1) + offset2;
 
             }
             offset0++;
@@ -129,23 +145,20 @@ void Sgrid::calculateNeighborsFaces() {
 
 void Sgrid::calculateNeighborsCells() {
 
-    std::map<int, std::vector<int>> neighborsCellsStd;
+    std::map<int, std::vector<int>> neighbors;
     for (int iFace = 0; iFace < _facesN; iFace++)
-        neighborsCellsStd[iFace] = std::vector<int>();
+        neighbors[iFace] = std::vector<int>();
 
     for (const auto &ent : _neighborsFaces)
         for (int i = 0; i < _neighborsFaces.at(ent.first).size(); i++)
-            neighborsCellsStd[_neighborsFaces.at(ent.first)(i)].push_back(ent.first);
+            neighbors[_neighborsFaces.at(ent.first)(i)].push_back(ent.first);
 
     for (int iFace = 0; iFace < _facesN; iFace++) {
 
-        auto size = neighborsCellsStd[iFace].size();
-        int *array = new int[size];
-        for (int i = 0; i < size; i++)
-            array[i] = neighborsCellsStd[iFace][i];
-
         _neighborsCells.insert(std::pair<int, Eigen::Map<Eigen::VectorXi>>(
-                iFace, Eigen::Map<Eigen::VectorXi>(array, size)));
+                iFace, Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+
+        copyStdVectotToEigenVector<int>(neighbors[iFace], _neighborsCells.at(iFace));
     }
 
 }
@@ -176,13 +189,15 @@ void Sgrid::calculateNormalsNeighborsFaces() {
         for (int i = 0; i < _neighborsFaces.at(ent.first).size(); i++) {
 
             int j;
-            for (j = 0; j < _neighborsCells.at(_neighborsFaces.at(ent.first)(i)).size(); j++)
+            for (j = 0;
+                 j < _neighborsCells.at(_neighborsFaces.at(ent.first)(i)).size(); j++)
 
                 if (_neighborsCells.at(_neighborsFaces.at(ent.first)(i))(j) == ent.first)
                     break;
 
             if (_neighborsCells.at(_neighborsFaces.at(ent.first)(i))(j) != ent.first) {
-                std::cerr << "Inconsistent stuff with normalsNeighborsFaces." << std::endl;
+                std::cerr << "Inconsistent stuff with normalsNeighborsFaces."
+                          << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
@@ -193,6 +208,137 @@ void Sgrid::calculateNormalsNeighborsFaces() {
 
 
 }
+
+void Sgrid::calculateMainTypesCells() {
+
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "left", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "right", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "bottom", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "top", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "front", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "back", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+
+    std::vector<int> left;
+    std::vector<int> right;
+    std::vector<int> bottom;
+    std::vector<int> top;
+    std::vector<int> front;
+    std::vector<int> back;
+
+    for (int iCell = 0; iCell < _cellsN; iCell++) {
+
+        if (calculateIXCell(iCell) == 0)
+            left.push_back(iCell);
+        else if (calculateIXCell(iCell) == _cellsDims[0] - 1)
+            right.push_back(iCell);
+
+        if (calculateIYCell(iCell) == 0)
+            bottom.push_back(iCell);
+        else if (calculateIYCell(iCell) == _cellsDims[1] - 1)
+            top.push_back(iCell);
+
+        if (calculateIZCell(iCell) == 0)
+            front.push_back(iCell);
+        else if (calculateIZCell(iCell) == _cellsDims[2] - 1)
+            back.push_back(iCell);
+
+    }
+
+    copyStdVectotToEigenVector<int>(left, _typesCells.at("left"));
+    copyStdVectotToEigenVector<int>(right, _typesCells.at("right"));
+    copyStdVectotToEigenVector<int>(bottom, _typesCells.at("bottom"));
+    copyStdVectotToEigenVector<int>(top, _typesCells.at("top"));
+    copyStdVectotToEigenVector<int>(front, _typesCells.at("front"));
+    copyStdVectotToEigenVector<int>(back, _typesCells.at("back"));
+
+}
+
+void Sgrid::calculateMainTypesFaces() {
+
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "left", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "right", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "bottom", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "top", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "front", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "back", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+
+    std::vector<int> left;
+    std::vector<int> right;
+    std::vector<int> bottom;
+    std::vector<int> top;
+    std::vector<int> front;
+    std::vector<int> back;
+
+    for (int i = 0; i < _typesCells.at("left").size(); i++) {
+        auto iCell = _typesCells.at("left")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1)
+                left.push_back(faces(j));
+    }
+
+    for (int i = 0; i < _typesCells.at("right").size(); i++) {
+        auto iCell = _typesCells.at("right")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1)
+                right.push_back(faces(j));
+    }
+
+    for (int i = 0; i < _typesCells.at("bottom").size(); i++) {
+        auto iCell = _typesCells.at("bottom")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1)
+                bottom.push_back(faces(j));
+    }
+
+    for (int i = 0; i < _typesCells.at("top").size(); i++) {
+        auto iCell = _typesCells.at("top")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1)
+                top.push_back(faces(j));
+    }
+
+    for (int i = 0; i < _typesCells.at("front").size(); i++) {
+        auto iCell = _typesCells.at("front")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1)
+                front.push_back(faces(j));
+    }
+
+    for (int i = 0; i < _typesCells.at("back").size(); i++) {
+        auto iCell = _typesCells.at("back")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1)
+                back.push_back(faces(j));
+    }
+
+
+    copyStdVectotToEigenVector<int>(left, _typesFaces.at("left"));
+    copyStdVectotToEigenVector<int>(right, _typesFaces.at("right"));
+    copyStdVectotToEigenVector<int>(bottom, _typesFaces.at("bottom"));
+    copyStdVectotToEigenVector<int>(top, _typesFaces.at("top"));
+    copyStdVectotToEigenVector<int>(front, _typesFaces.at("front"));
+    copyStdVectotToEigenVector<int>(back, _typesFaces.at("back"));
+
+}
+
 
 void Sgrid::calculateGridProps() {
 
@@ -214,7 +360,11 @@ void Sgrid::calculateGridProps() {
     calculateNormalsNeighborsCells();
     calculateNormalsNeighborsFaces();
 
+    calculateMainTypesCells();
+    calculateMainTypesFaces();
+
 }
+
 
 void saveFilesCollectionToFile(const std::string &fileName,
                                const std::vector<std::string> &filesNames,

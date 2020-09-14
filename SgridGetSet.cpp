@@ -91,13 +91,13 @@ void Sgrid::setCellsDims(Eigen::Ref<Eigen::Vector3i> cellsDims) {
 }
 
 
-std::map<std::string, Eigen::Ref<Eigen::VectorXi>> Sgrid::getActiveCells(){
-    return Eigen::mapGetter<std::string, Eigen::VectorXi>(_activeCells);
+std::map<std::string, Eigen::Ref<Eigen::VectorXi>> Sgrid::getTypesCells(){
+    return Eigen::mapGetter<std::string, Eigen::VectorXi>(_typesCells);
 }
 
-void Sgrid::setActiveCells(
-        std::map<std::string, Eigen::Ref<Eigen::VectorXi>> activeCells){
-    Eigen::mapSetter<std::string, Eigen::VectorXi>(activeCells, _activeCells);
+void Sgrid::setTypesCells(
+        std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesCells){
+    Eigen::mapSetter<std::string, Eigen::VectorXi>(typesCells, _typesCells);
 }
 
 
@@ -110,13 +110,13 @@ void Sgrid::setFacesDims(std::map<int, Eigen::Ref<Eigen::Vector3i>> facesDims) {
 }
 
 
-std::map<std::string, Eigen::Ref<Eigen::VectorXi>> Sgrid::getBoundFaces(){
-    return Eigen::mapGetter<std::string, Eigen::VectorXi>(_boundFaces);
+std::map<std::string, Eigen::Ref<Eigen::VectorXi>> Sgrid::getTypesFaces(){
+    return Eigen::mapGetter<std::string, Eigen::VectorXi>(_typesFaces);
 }
 
-void Sgrid::setBoundFaces(
-        std::map<std::string, Eigen::Ref<Eigen::VectorXi>> boundFaces){
-    Eigen::mapSetter<std::string, Eigen::VectorXi>(boundFaces, _boundFaces);
+void Sgrid::setTypesFaces(
+        std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesFaces){
+    Eigen::mapSetter<std::string, Eigen::VectorXi>(typesFaces, _typesFaces);
 }
 
 
