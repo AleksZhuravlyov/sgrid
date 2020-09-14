@@ -27,6 +27,7 @@
 #include<string>
 #include<vector>
 #include<map>
+#include<set>
 
 #include <pugixml.hpp>
 
@@ -216,46 +217,69 @@ void Sgrid::calculateMainTypesCells() {
     _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             "right", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
     _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
-            "bottom", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
-            "top", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             "front", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
     _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             "back", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "bottom", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "top", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+
+
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
 
     std::vector<int> left;
     std::vector<int> right;
-    std::vector<int> bottom;
-    std::vector<int> top;
     std::vector<int> front;
     std::vector<int> back;
+    std::vector<int> bottom;
+    std::vector<int> top;
+
+    std::vector<int> nonbound;
 
     for (int iCell = 0; iCell < _cellsN; iCell++) {
 
-        if (calculateIXCell(iCell) == 0)
+        bool isXNonbound = false;
+        auto iX = calculateIXCell(iCell);
+        if (iX == 0)
             left.push_back(iCell);
-        else if (calculateIXCell(iCell) == _cellsDims[0] - 1)
+        else if (iX == _cellsDims[0] - 1)
             right.push_back(iCell);
+        else
+            isXNonbound = true;
 
-        if (calculateIYCell(iCell) == 0)
-            bottom.push_back(iCell);
-        else if (calculateIYCell(iCell) == _cellsDims[1] - 1)
-            top.push_back(iCell);
-
-        if (calculateIZCell(iCell) == 0)
+        bool isYNonbound = false;
+        auto iY = calculateIYCell(iCell);
+        if (iY == 0)
             front.push_back(iCell);
-        else if (calculateIZCell(iCell) == _cellsDims[2] - 1)
+        else if (iY == _cellsDims[1] - 1)
             back.push_back(iCell);
+        else
+            isYNonbound = true;
+
+        bool isZNonbound = false;
+        auto iZ = calculateIZCell(iCell);
+        if (iZ == 0)
+            bottom.push_back(iCell);
+        else if (iZ == _cellsDims[2] - 1)
+            top.push_back(iCell);
+        else
+            isZNonbound = true;
+
+        if (isXNonbound and isYNonbound and isZNonbound)
+            nonbound.push_back(iCell);
 
     }
 
     copyStdVectotToEigenVector<int>(left, _typesCells.at("left"));
     copyStdVectotToEigenVector<int>(right, _typesCells.at("right"));
-    copyStdVectotToEigenVector<int>(bottom, _typesCells.at("bottom"));
-    copyStdVectotToEigenVector<int>(top, _typesCells.at("top"));
     copyStdVectotToEigenVector<int>(front, _typesCells.at("front"));
     copyStdVectotToEigenVector<int>(back, _typesCells.at("back"));
+    copyStdVectotToEigenVector<int>(bottom, _typesCells.at("bottom"));
+    copyStdVectotToEigenVector<int>(top, _typesCells.at("top"));
+
+    copyStdVectotToEigenVector<int>(nonbound, _typesCells.at("nonbound"));
 
 }
 
@@ -266,26 +290,31 @@ void Sgrid::calculateMainTypesFaces() {
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             "right", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
-            "bottom", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
-            "top", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             "front", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             "back", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "bottom", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "top", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            "nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
 
     std::vector<int> left;
     std::vector<int> right;
-    std::vector<int> bottom;
-    std::vector<int> top;
     std::vector<int> front;
     std::vector<int> back;
+    std::vector<int> bottom;
+    std::vector<int> top;
+
+    std::set<int> nonboundSet;
 
     for (int i = 0; i < _typesCells.at("left").size(); i++) {
         auto iCell = _typesCells.at("left")(i);
         auto &faces = _neighborsFaces.at(iCell);
         for (int j = 0; j < faces.size(); j++)
-            if (_neighborsCells.at(faces(j)).size() == 1)
+            if (_neighborsCells.at(faces(j)).size() == 1 and _facesAxis[faces(j)] == 0)
                 left.push_back(faces(j));
     }
 
@@ -293,31 +322,15 @@ void Sgrid::calculateMainTypesFaces() {
         auto iCell = _typesCells.at("right")(i);
         auto &faces = _neighborsFaces.at(iCell);
         for (int j = 0; j < faces.size(); j++)
-            if (_neighborsCells.at(faces(j)).size() == 1)
+            if (_neighborsCells.at(faces(j)).size() == 1 and _facesAxis[faces(j)] == 0)
                 right.push_back(faces(j));
-    }
-
-    for (int i = 0; i < _typesCells.at("bottom").size(); i++) {
-        auto iCell = _typesCells.at("bottom")(i);
-        auto &faces = _neighborsFaces.at(iCell);
-        for (int j = 0; j < faces.size(); j++)
-            if (_neighborsCells.at(faces(j)).size() == 1)
-                bottom.push_back(faces(j));
-    }
-
-    for (int i = 0; i < _typesCells.at("top").size(); i++) {
-        auto iCell = _typesCells.at("top")(i);
-        auto &faces = _neighborsFaces.at(iCell);
-        for (int j = 0; j < faces.size(); j++)
-            if (_neighborsCells.at(faces(j)).size() == 1)
-                top.push_back(faces(j));
     }
 
     for (int i = 0; i < _typesCells.at("front").size(); i++) {
         auto iCell = _typesCells.at("front")(i);
         auto &faces = _neighborsFaces.at(iCell);
         for (int j = 0; j < faces.size(); j++)
-            if (_neighborsCells.at(faces(j)).size() == 1)
+            if (_neighborsCells.at(faces(j)).size() == 1 and _facesAxis[faces(j)] == 1)
                 front.push_back(faces(j));
     }
 
@@ -325,17 +338,45 @@ void Sgrid::calculateMainTypesFaces() {
         auto iCell = _typesCells.at("back")(i);
         auto &faces = _neighborsFaces.at(iCell);
         for (int j = 0; j < faces.size(); j++)
-            if (_neighborsCells.at(faces(j)).size() == 1)
+            if (_neighborsCells.at(faces(j)).size() == 1 and _facesAxis[faces(j)] == 1)
                 back.push_back(faces(j));
+    }
+
+    for (int i = 0; i < _typesCells.at("bottom").size(); i++) {
+        auto iCell = _typesCells.at("bottom")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1 and _facesAxis[faces(j)] == 2)
+                bottom.push_back(faces(j));
+    }
+
+    for (int i = 0; i < _typesCells.at("top").size(); i++) {
+        auto iCell = _typesCells.at("top")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            if (_neighborsCells.at(faces(j)).size() == 1 and _facesAxis[faces(j)] == 2)
+                top.push_back(faces(j));
+    }
+
+
+    for (int i = 0; i < _typesCells.at("nonbound").size(); i++) {
+        auto iCell = _typesCells.at("nonbound")(i);
+        auto &faces = _neighborsFaces.at(iCell);
+        for (int j = 0; j < faces.size(); j++)
+            nonboundSet.insert(faces(j));
     }
 
 
     copyStdVectotToEigenVector<int>(left, _typesFaces.at("left"));
     copyStdVectotToEigenVector<int>(right, _typesFaces.at("right"));
-    copyStdVectotToEigenVector<int>(bottom, _typesFaces.at("bottom"));
-    copyStdVectotToEigenVector<int>(top, _typesFaces.at("top"));
     copyStdVectotToEigenVector<int>(front, _typesFaces.at("front"));
     copyStdVectotToEigenVector<int>(back, _typesFaces.at("back"));
+    copyStdVectotToEigenVector<int>(bottom, _typesFaces.at("bottom"));
+    copyStdVectotToEigenVector<int>(top, _typesFaces.at("top"));
+
+    std::vector<int> nonbound(nonboundSet.size());
+    std::copy(nonboundSet.begin(), nonboundSet.end(), nonbound.begin());
+    copyStdVectotToEigenVector<int>(nonbound, _typesFaces.at("nonbound"));
 
 }
 
