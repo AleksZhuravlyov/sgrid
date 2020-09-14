@@ -69,9 +69,21 @@ public:
     void setCellsDims(Eigen::Ref<Eigen::Vector3i> cellsDims);
 
 
+    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getActiveCells();
+
+    void setActiveCells(
+            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> activeCells);
+
+
     std::map<int, Eigen::Ref<Eigen::Vector3i>> getFacesDims();
 
     void setFacesDims(std::map<int, Eigen::Ref<Eigen::Vector3i>> facesDims);
+
+
+    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getBoundFaces();
+
+    void setBoundFaces(
+            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> boundFaces);
 
 
     Eigen::Ref<Eigen::Vector3d> getFaceS();
@@ -125,10 +137,13 @@ public:
 
     Eigen::Map<Eigen::Vector3i> _cellsDims;
     int _cellsN;
+    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _activeCells;
+
 
     std::map<int, Eigen::Map<Eigen::Vector3i>> _facesDims;
     int _facesN;
     std::map<int, int> _facesAxis;
+    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _boundFaces;
 
     double _cellV;
     Eigen::Map<Eigen::Vector3d> _faceS;

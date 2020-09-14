@@ -59,11 +59,15 @@ PYBIND11_MODULE(sgrid_bind, m) {
             .def_property("cells_dims",
                           &Sgrid::getCellsDims, &Sgrid::setCellsDims)
             .def_readwrite("cells_N", &Sgrid::_cellsN)
+            .def_property("active_cells",
+                          &Sgrid::getActiveCells, &Sgrid::setActiveCells)
 
             .def_property("faces_dims",
                           &Sgrid::getFacesDims, &Sgrid::setFacesDims)
             .def_readwrite("faces_N", &Sgrid::_facesN)
             .def_readwrite("faces_axis", &Sgrid::_facesAxis)
+            .def_property("bound_faces",
+                          &Sgrid::getBoundFaces, &Sgrid::setBoundFaces)
 
             .def_readwrite("cell_V", &Sgrid::_cellV)
             .def_property("face_S", &Sgrid::getFaceS, &Sgrid::setFaceS)
