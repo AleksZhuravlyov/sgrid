@@ -47,6 +47,20 @@ public:
     void save(const std::string &fileName);
 
 
+    int calculateICell(const int &iX, const int &iY, const int &iZ);
+
+    int calculateIXCell(const int &iCell);
+
+    int calculateIYCell(const int &iCell);
+
+    int calculateIZCell(const int &iCell);
+
+
+    void setCellsType(const std::string& name, Eigen::Ref<Eigen::VectorXi> cells);
+
+    void calculateFacesTypeByCellsType(const std::string& name);
+
+
     /// Accessors and mutators
 
     Eigen::Ref<Eigen::Vector3i> getPointsDims();
@@ -177,14 +191,6 @@ public:
     void calculateCellV();
 
     void calculateFaceS();
-
-    int calculateICell(const int &iX, const int &iY, const int &iZ);
-
-    int calculateIXCell(const int &iCell);
-
-    int calculateIYCell(const int &iCell);
-
-    int calculateIZCell(const int &iCell);
 
     void calculateNeighborsFaces();
 

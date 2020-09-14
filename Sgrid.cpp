@@ -47,6 +47,56 @@ Sgrid::Sgrid(Eigen::Ref<Eigen::Vector3i> pointsDims,
 }
 
 
+int Sgrid::calculateICell(const int &iX, const int &iY, const int &iZ) {
+    return iX + iY * _cellsDims(0) + iZ * _cellsDims(0) * _cellsDims(1);
+}
+
+int Sgrid::calculateIXCell(const int &iCell) {
+    return (iCell % (_cellsDims(0) * _cellsDims(1))) % _cellsDims(0);
+}
+
+int Sgrid::calculateIYCell(const int &iCell) {
+    return (iCell % (_cellsDims(0) * _cellsDims(1))) / _cellsDims(0);
+}
+
+int Sgrid::calculateIZCell(const int &iCell) {
+    return iCell / (_cellsDims(0) * _cellsDims(1));
+}
+
+
+void Sgrid::setCellsType(const std::string &name, Eigen::Ref<Eigen::VectorXi> cells) {
+
+    _typesCells.erase(name);
+
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            name, Eigen::Map<Eigen::VectorXi>(cells.data(), cells.size())));
+
+}
+
+void Sgrid::calculateFacesTypeByCellsType(const std::string &name) {
+
+    std::set<int> set;
+    auto &cells = _typesCells.at(name);
+    for (int i = 0; i < cells.size(); i++) {
+        auto &faces = _neighborsFaces.at(cells(i));
+        for (int j = 0; j < faces.size(); j++) {
+            auto face = faces(j);
+            if (set.find(face) == set.end())
+                set.insert(face);
+            else set.erase(face);
+        }
+    }
+
+    _typesFaces.erase(name);
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            name, Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    std::vector<int> vector(set.size());
+    std::copy(set.begin(), set.end(), vector.begin());
+    copyStdVectotToEigenVector<int>(vector, _typesFaces.at(name));
+
+}
+
+
 void Sgrid::calculatePointsN() {
     _pointsN = _pointsDims.prod();
 }
@@ -94,22 +144,6 @@ void Sgrid::calculateFaceS() {
     _faceS = Eigen::Vector3d(_spacing(1) * _spacing(2),
                              _spacing(0) * _spacing(2),
                              _spacing(0) * _spacing(1));
-}
-
-int Sgrid::calculateICell(const int &iX, const int &iY, const int &iZ) {
-    return iX + iY * _cellsDims(0) + iZ * _cellsDims(0) * _cellsDims(1);
-}
-
-int Sgrid::calculateIXCell(const int &iCell) {
-    return (iCell % (_cellsDims(0) * _cellsDims(1))) % _cellsDims(0);
-}
-
-int Sgrid::calculateIYCell(const int &iCell) {
-    return (iCell % (_cellsDims(0) * _cellsDims(1))) / _cellsDims(0);
-}
-
-int Sgrid::calculateIZCell(const int &iCell) {
-    return iCell / (_cellsDims(0) * _cellsDims(1));
 }
 
 void Sgrid::calculateNeighborsFaces() {
