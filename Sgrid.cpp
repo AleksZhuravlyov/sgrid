@@ -29,8 +29,6 @@
 #include<map>
 #include<set>
 
-#include <pugixml.hpp>
-
 
 Sgrid::Sgrid(Eigen::Ref<Eigen::Vector3i> pointsDims,
              Eigen::Ref<Eigen::Vector3d> pointsOrigin,
@@ -437,36 +435,5 @@ void Sgrid::calculateGridProps() {
 
     calculateMainTypesCells();
     calculateMainTypesFaces();
-
-}
-
-
-void saveFilesCollectionToFile(const std::string &fileName,
-                               const std::vector<std::string> &filesNames,
-                               const std::vector<std::string> &filesDescriptions) {
-
-    pugi::xml_document doc;
-
-    pugi::xml_node vtkFile = doc.append_child("VTKFile");
-    vtkFile.append_attribute("type") = "Collection";
-    vtkFile.append_attribute("version") = "1.0";
-    vtkFile.append_attribute("byte_order") = "LittleEndian";
-    vtkFile.append_attribute("header_type") = "UInt64";
-
-    pugi::xml_node collection = vtkFile.append_child("Collection");
-
-    for (int i = 0; i < filesNames.size(); i++) {
-
-        collection.append_child("DataSet");
-
-        collection.last_child().append_attribute("timestep").set_value(
-                filesDescriptions[i].c_str());
-
-        collection.last_child().append_attribute("file").set_value(
-                filesNames[i].c_str());
-
-    }
-
-    doc.save_file(fileName.c_str());
 
 }
