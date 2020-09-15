@@ -30,7 +30,7 @@ sys.path.append(os.path.join(current_path, '../'))
 
 from sgrid import Sgrid
 
-points_dims = np.array([4, 4, 4], dtype=np.int32)
+points_dims = np.array([10, 10, 2], dtype=np.int32)
 points_origin = np.array([0., 0., 0.], dtype=np.float)
 spacing = np.array([1., 1., 1.], dtype=np.float)
 

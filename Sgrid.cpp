@@ -286,34 +286,39 @@ void Sgrid::calculateMainTypesCells() {
 
     for (int iCell = 0; iCell < _cellsN; iCell++) {
 
-        bool isXNonbound = false;
+        bool isICellNonbound = true;
+
         auto iX = calculateIXCell(iCell);
-        if (iX == 0)
+        if (iX == 0) {
             left.push_back(iCell);
-        else if (iX == _cellsDims[0] - 1)
+            isICellNonbound = false;
+        }
+        if (iX == _cellsDims[0] - 1) {
             right.push_back(iCell);
-        else
-            isXNonbound = true;
+            isICellNonbound = false;
+        }
 
-        bool isYNonbound = false;
         auto iY = calculateIYCell(iCell);
-        if (iY == 0)
+        if (iY == 0) {
             front.push_back(iCell);
-        else if (iY == _cellsDims[1] - 1)
+            isICellNonbound = false;
+        }
+        if (iY == _cellsDims[1] - 1) {
             back.push_back(iCell);
-        else
-            isYNonbound = true;
+            isICellNonbound = false;
+        }
 
-        bool isZNonbound = false;
         auto iZ = calculateIZCell(iCell);
-        if (iZ == 0)
+        if (iZ == 0) {
             bottom.push_back(iCell);
-        else if (iZ == _cellsDims[2] - 1)
+            isICellNonbound = false;
+        }
+        if (iZ == _cellsDims[2] - 1) {
             top.push_back(iCell);
-        else
-            isZNonbound = true;
+            isICellNonbound = false;
+        }
 
-        if (isXNonbound and isYNonbound and isZNonbound)
+        if (isICellNonbound)
             nonbound.push_back(iCell);
 
     }
