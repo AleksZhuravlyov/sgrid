@@ -135,15 +135,18 @@ void Sgrid::processTypesByCellsType(const std::string &name) {
     }
 
     _typesFaces.erase(name + "_bound");
+
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             name + "_bound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
     copyStdSetToEigenVector<int>(facesBound, _typesFaces.at(name + "_bound"));
 
     _typesFaces.erase(name + "_nonbound");
-    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
-            name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    copyStdSetToEigenVector<int>(facesNonbound,
-                                 _typesFaces.at(name + "_nonbound"));
+    if (!facesNonbound.empty()) {
+        _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+                name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+        copyStdSetToEigenVector<int>(facesNonbound,
+                                     _typesFaces.at(name + "_nonbound"));
+    }
 
 
     std::set<int> cellsNeighborBound;
@@ -172,10 +175,12 @@ void Sgrid::processTypesByCellsType(const std::string &name) {
     copyStdSetToEigenVector<int>(cellsBound, _typesCells.at(name + "_bound"));
 
     _typesCells.erase(name + "_nonbound");
-    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
-            name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    copyStdSetToEigenVector<int>(cellsNonbound,
-                                 _typesCells.at(name + "_nonbound"));
+    if (!cellsNonbound.empty()) {
+        _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+                name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+        copyStdSetToEigenVector<int>(cellsNonbound,
+                                     _typesCells.at(name + "_nonbound"));
+    }
 
 
 }

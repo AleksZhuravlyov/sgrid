@@ -97,9 +97,11 @@ array = np.array([0, 1, 2], dtype=np.int32)
 sgrid.set_cells_type('test', array)
 sgrid.process_type_by_cells_type('test')
 print('sgrid.types_cells[\'test\']', sgrid.types_cells['test'])
-print('sgrid.types_cells[\'test_nonbound\']',  sgrid.types_cells['test_nonbound'])
+if 'test_nonbound' in sgrid.types_cells:
+    print('sgrid.types_cells[\'test_nonbound\']',  sgrid.types_cells['test_nonbound'])
 print('sgrid.types_cells[\'test_bound\']', sgrid.types_cells['test_bound'])
-print('sgrid.types_faces[\'test_nonbound\']',  sgrid.types_faces['test_nonbound'])
+if 'test_nonbound' in sgrid.types_faces:
+    print('sgrid.types_faces[\'test_nonbound\']',  sgrid.types_faces['test_nonbound'])
 print('sgrid.types_faces[\'test_bound\']', sgrid.types_faces['test_bound'])
 
 
