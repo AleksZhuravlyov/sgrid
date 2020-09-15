@@ -71,20 +71,20 @@ void Sgrid::setCellsType(const std::string &name, Eigen::Ref<Eigen::VectorXi> ce
 
 }
 
-void Sgrid::calculateFacesTypesByCellsType(const std::string &name) {
+void Sgrid::processFacesTypesByCellsType(const std::string &name) {
 
-    std::set<int> setBound;
-    std::set<int> setNonbound;
+    std::set<int> setFacesBound;
+    std::set<int> setFacesNonbound;
     auto &cells = _typesCells.at(name);
     for (int i = 0; i < cells.size(); i++) {
         auto &faces = _neighborsFaces.at(cells(i));
         for (int j = 0; j < faces.size(); j++) {
             auto face = faces(j);
-            if (setBound.find(face) == setBound.end())
-                setBound.insert(face);
+            if (setFacesBound.find(face) == setFacesBound.end())
+                setFacesBound.insert(face);
             else {
-                setBound.erase(face);
-                setNonbound.insert(face);
+                setFacesBound.erase(face);
+                setFacesNonbound.insert(face);
             }
         }
     }
@@ -92,19 +92,87 @@ void Sgrid::calculateFacesTypesByCellsType(const std::string &name) {
     _typesFaces.erase(name + "_bound");
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
             name + "_bound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    std::vector<int> vectorBound(setBound.size());
-    std::copy(setBound.begin(), setBound.end(), vectorBound.begin());
-    copyStdVectotToEigenVector<int>(vectorBound, _typesFaces.at(name + "_bound"));
+    std::vector<int> vectorFacesBound(setFacesBound.size());
+    std::copy(setFacesBound.begin(), setFacesBound.end(), vectorFacesBound.begin());
+    copyStdVectotToEigenVector<int>(vectorFacesBound, _typesFaces.at(name + "_bound"));
 
     _typesFaces.erase(name + "_nonbound");
-    if (!setNonbound.empty()) {
+    if (!setFacesNonbound.empty()) {
         _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
                 name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-        std::vector<int> vectorNonbound(setNonbound.size());
-        std::copy(setNonbound.begin(), setNonbound.end(), vectorNonbound.begin());
-        copyStdVectotToEigenVector<int>(vectorNonbound,
+        std::vector<int> vectorFacesNonbound(setFacesNonbound.size());
+        std::copy(setFacesNonbound.begin(), setFacesNonbound.end(),
+                  vectorFacesNonbound.begin());
+        copyStdVectotToEigenVector<int>(vectorFacesNonbound,
                                         _typesFaces.at(name + "_nonbound"));
     }
+
+    std::set<int> setCellsNeighborBound;
+    for (auto &face : setFacesBound)
+        for (int i = 0; i < _neighborsCells.at(face).size(); i++)
+            setCellsNeighborBound.insert(_neighborsCells.at(face)(i));
+    std::set<int> setCells;
+    for (int i = 0; i < cells.size(); i++)
+        setCells.insert(_typesCells.at(name)(i));
+    std::set<int> setCellsBound;
+    std::set_intersection(setCells.begin(), setCells.end(),
+                          setCellsNeighborBound.begin(), setCellsNeighborBound.end(),
+                          std::inserter(setCellsBound, setCellsBound.begin()));
+    std::set<int> setCellsNonbound;
+    std::set_difference(setCells.begin(), setCells.end(),
+                        setCellsBound.begin(), setCellsBound.end(),
+                        std::inserter(setCellsNonbound, setCellsNonbound.begin()));
+
+
+    _typesCells.erase(name + "_bound");
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            name + "_bound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    std::vector<int> vectorCellsBound(setCellsBound.size());
+    std::copy(setCellsBound.begin(), setCellsBound.end(), vectorCellsBound.begin());
+    copyStdVectotToEigenVector<int>(vectorCellsBound, _typesCells.at(name + "_bound"));
+
+    _typesCells.erase(name + "_nonbound");
+    if (!setCellsNonbound.empty()) {
+        _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+                name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+        std::vector<int> vectorCellsNonbound(setCellsNonbound.size());
+        std::copy(setCellsNonbound.begin(), setCellsNonbound.end(),
+                  vectorCellsNonbound.begin());
+        copyStdVectotToEigenVector<int>(vectorCellsNonbound,
+                                        _typesCells.at(name + "_nonbound"));
+    }
+
+
+    /*std::set<int> setCellsNonbound;
+    std::set<int> setCellsBound;
+    for (auto &face : setFacesNonbound)
+        for (int i = 0; i < _neighborsCells.at(face).size(); i++)
+            setCellsNonbound.insert(_neighborsCells.at(face)(i));
+    std::set<int> setCells;
+    for (int i = 0; i < cells.size(); i++)
+        setCells.insert(_typesCells.at(name)(i));
+    std::set_difference(setCells.begin(), setCells.end(),
+                        setCellsNonbound.begin(), setCellsNonbound.end(),
+                        std::inserter(setCellsBound, setCellsBound.begin()));
+
+    _typesCells.erase(name + "_bound");
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+            name + "_bound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    std::vector<int> vectorCellsBound(setCellsBound.size());
+    std::copy(setCellsBound.begin(), setCellsBound.end(), vectorCellsBound.begin());
+    copyStdVectotToEigenVector<int>(vectorCellsBound, _typesCells.at(name + "_bound"));
+
+    _typesCells.erase(name + "_nonbound");
+    if (!setCellsNonbound.empty()) {
+        _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+                name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+        std::vector<int> vectorCellsNonbound(setCellsNonbound.size());
+        std::copy(setCellsNonbound.begin(), setCellsNonbound.end(),
+                  vectorCellsNonbound.begin());
+        copyStdVectotToEigenVector<int>(vectorCellsNonbound,
+                                        _typesCells.at(name + "_nonbound"));
+    }*/
+
 
 }
 
