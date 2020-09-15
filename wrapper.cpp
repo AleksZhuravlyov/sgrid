@@ -51,9 +51,17 @@ PYBIND11_MODULE(sgrid_bind, m) {
             .def("calculate_i_y_cell", &Sgrid::calculateIYCell, "i_cell"_a)
             .def("calculate_i_z_cell", &Sgrid::calculateIZCell, "i_cell"_a)
 
+            .def("calculate_i_x_face", &Sgrid::calculateAxisFace, "i_face"_a)
+            .def("calculate_i_x_face", &Sgrid::calculateOffsetFace, "axis"_a)
+            .def("calculate_i_face", &Sgrid::calculateIFace,
+                 "axis"_a, "i_x"_a, "i_y"_a, "i_z"_a)
+            .def("calculate_i_x_face", &Sgrid::calculateIXFace, "i_face"_a)
+            .def("calculate_i_y_face", &Sgrid::calculateIYFace, "i_face"_a)
+            .def("calculate_i_z_face", &Sgrid::calculateIZFace, "i_face"_a)
+
             .def("set_cells_type", &Sgrid::setCellsType, "name"_a, "cells"_a)
-            .def("process_faces_type_by_cells_type",
-                 &Sgrid::processFacesTypesByCellsType, "name"_a)
+            .def("process_type_by_cells_type",
+                 &Sgrid::processTypesByCellsType, "name"_a)
 
             .def_property("points_dims",
                           &Sgrid::getPointsDims, &Sgrid::setPointsDims)

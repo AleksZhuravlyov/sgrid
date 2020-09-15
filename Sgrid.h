@@ -57,9 +57,23 @@ public:
     int calculateIZCell(const int &iCell);
 
 
+    int calculateAxisFace(const int &iFace);
+
+    int calculateOffsetFace(const int &axis);
+
+    int calculateIFace(const int &axis,
+                       const int &iX, const int &iY, const int &iZ);
+
+    int calculateIXFace(const int &iFace);
+
+    int calculateIYFace(const int &iFace);
+
+    int calculateIZFace(const int &iFace);
+
+
     void setCellsType(const std::string &name, Eigen::Ref<Eigen::VectorXi> cells);
 
-    void processFacesTypesByCellsType(const std::string &name);
+    void processTypesByCellsType(const std::string &name);
 
 
     /// Accessors and mutators
