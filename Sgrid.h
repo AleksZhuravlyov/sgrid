@@ -58,7 +58,7 @@ public:
 
     void setCellsType(const std::string& name, Eigen::Ref<Eigen::VectorXi> cells);
 
-    void calculateFacesTypeByCellsType(const std::string& name);
+    void calculateFacesTypesByCellsType(const std::string& name);
 
 
     /// Accessors and mutators

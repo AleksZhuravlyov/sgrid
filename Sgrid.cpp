@@ -71,26 +71,40 @@ void Sgrid::setCellsType(const std::string &name, Eigen::Ref<Eigen::VectorXi> ce
 
 }
 
-void Sgrid::calculateFacesTypeByCellsType(const std::string &name) {
+void Sgrid::calculateFacesTypesByCellsType(const std::string &name) {
 
-    std::set<int> set;
+    std::set<int> setBound;
+    std::set<int> setNonbound;
     auto &cells = _typesCells.at(name);
     for (int i = 0; i < cells.size(); i++) {
         auto &faces = _neighborsFaces.at(cells(i));
         for (int j = 0; j < faces.size(); j++) {
             auto face = faces(j);
-            if (set.find(face) == set.end())
-                set.insert(face);
-            else set.erase(face);
+            if (setBound.find(face) == setBound.end())
+                setBound.insert(face);
+            else {
+                setBound.erase(face);
+                setNonbound.insert(face);
+            }
         }
     }
 
-    _typesFaces.erase(name);
+    _typesFaces.erase(name + "_bound");
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
-            name, Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
-    std::vector<int> vector(set.size());
-    std::copy(set.begin(), set.end(), vector.begin());
-    copyStdVectotToEigenVector<int>(vector, _typesFaces.at(name));
+            name + "_bound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+    std::vector<int> vectorBound(setBound.size());
+    std::copy(setBound.begin(), setBound.end(), vectorBound.begin());
+    copyStdVectotToEigenVector<int>(vectorBound, _typesFaces.at(name + "_bound"));
+
+    _typesFaces.erase(name + "_nonbound");
+    if (!setNonbound.empty()) {
+        _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXi>>(
+                name + "_nonbound", Eigen::Map<Eigen::VectorXi>(new int[1], 1)));
+        std::vector<int> vectorNonbound(setNonbound.size());
+        std::copy(setNonbound.begin(), setNonbound.end(), vectorNonbound.begin());
+        copyStdVectotToEigenVector<int>(vectorNonbound,
+                                        _typesFaces.at(name + "_nonbound"));
+    }
 
 }
 
