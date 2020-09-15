@@ -26,6 +26,7 @@
 #include<string>
 #include<vector>
 #include<map>
+#include<set>
 #include <iostream>
 
 #include <Eigen/Dense>
@@ -56,9 +57,9 @@ public:
     int calculateIZCell(const int &iCell);
 
 
-    void setCellsType(const std::string& name, Eigen::Ref<Eigen::VectorXi> cells);
+    void setCellsType(const std::string &name, Eigen::Ref<Eigen::VectorXi> cells);
 
-    void processFacesTypesByCellsType(const std::string& name);
+    void processFacesTypesByCellsType(const std::string &name);
 
 
     /// Accessors and mutators
@@ -218,12 +219,26 @@ void saveFilesCollectionToFile(const std::string &fileName,
 template<class T>
 void copyStdVectotToEigenVector(
         std::vector<T> &stdVector,
-        Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>>& eigenVector) {
+        Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> &eigenVector) {
     auto size = stdVector.size();
     delete[] eigenVector.data();
     new(&eigenVector) Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>>(new T[size], size);
     for (int i = 0; i < size; i++)
         eigenVector(i) = stdVector[i];
+}
+
+template<class T>
+void copyStdSetToEigenVector(
+        std::set<T> &stdSet,
+        Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> &eigenVector) {
+    auto size = stdSet.size();
+    delete[] eigenVector.data();
+    new(&eigenVector) Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>>(new T[size], size);
+    int i = 0;
+    for (auto &value: stdSet) {
+        eigenVector(i) = value;
+        i++;
+    }
 }
 
 
