@@ -149,10 +149,13 @@ Sgrid::Sgrid(const std::string &fileName) {
     reader->Update();
     auto structuredGrid = reader->GetOutput();
 
-    _pointsDims = std::vector<int>(structuredGrid->GetDimensions(),
-                                   structuredGrid->GetDimensions() + 3);
+    auto dims = structuredGrid->GetDimensions();
+
+    _pointsDims = {uint16_t(dims[0]), uint16_t(dims[1]), uint16_t(dims[2])};
+
+
+
     _pointsN = _pointsDims[0] * _pointsDims[1] * _pointsDims[2];
-    _pointsOrigin = {0, 0, 0};
 
     auto xyz = static_cast<double *>(structuredGrid->GetPoints()->GetData()->
             GetVoidPointer(0));
@@ -162,9 +165,9 @@ Sgrid::Sgrid(const std::string &fileName) {
                 xyz[_pointsDims[0] * 3 + 1] - xyz[1],
                 xyz[_pointsDims[0] * _pointsDims[1] * 3 + 2] - xyz[2]};
 
-    _cellsDims = {(_pointsDims[0] - 1),
-                  (_pointsDims[1] - 1),
-                  (_pointsDims[2] - 1)};
+    _cellsDims = {uint16_t(_pointsDims[0] - 1),
+                  uint16_t(_pointsDims[1] - 1),
+                  uint16_t(_pointsDims[2] - 1)};
     _cellsN = (_pointsDims[0] - 1) * (_pointsDims[1] - 1) * (_pointsDims[2] - 1);
     _cellV = _spacing[0] * _spacing[1] * _spacing[2];
 

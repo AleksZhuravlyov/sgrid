@@ -36,7 +36,7 @@ using namespace pybind11::literals;
 
 PYBIND11_MODULE(sgrid_bind, m) {
     py::class_<Sgrid, std::shared_ptr<Sgrid>>(m, "Sgrid")
-            .def(py::init<const std::vector<int>,
+            .def(py::init<const std::vector<uint16_t>,
                          const std::vector<double>,
                          const std::vector<double>>(),
                  "points_dims"_a, "points_origin"_a, "spacing"_a)

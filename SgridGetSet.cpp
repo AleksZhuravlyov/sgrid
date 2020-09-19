@@ -58,23 +58,23 @@ namespace Eigen {
 
 // Eigens accessors and mutators
 
-std::map<std::string, Eigen::Ref<Eigen::VectorXi>> Sgrid::getTypesCells() {
-    return Eigen::mapGetter<std::string, Eigen::VectorXi>(_typesCells);
+std::map<std::string, Eigen::Ref<Eigen::VectorXui64>> Sgrid::getTypesCells() {
+    return Eigen::mapGetter<std::string, Eigen::VectorXui64>(_typesCells);
 }
 
 void Sgrid::setTypesCells(
-        std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesCells) {
-    Eigen::mapSetter<std::string, Eigen::VectorXi>(typesCells, _typesCells);
+        std::map<std::string, Eigen::Ref<Eigen::VectorXui64>> typesCells) {
+    Eigen::mapSetter<std::string, Eigen::VectorXui64>(typesCells, _typesCells);
 }
 
 
-std::map<std::string, Eigen::Ref<Eigen::VectorXi>> Sgrid::getTypesFaces() {
-    return Eigen::mapGetter<std::string, Eigen::VectorXi>(_typesFaces);
+std::map<std::string, Eigen::Ref<Eigen::VectorXui64>> Sgrid::getTypesFaces() {
+    return Eigen::mapGetter<std::string, Eigen::VectorXui64>(_typesFaces);
 }
 
 void Sgrid::setTypesFaces(
-        std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesFaces) {
-    Eigen::mapSetter<std::string, Eigen::VectorXi>(typesFaces, _typesFaces);
+        std::map<std::string, Eigen::Ref<Eigen::VectorXui64>> typesFaces) {
+    Eigen::mapSetter<std::string, Eigen::VectorXui64>(typesFaces, _typesFaces);
 }
 
 
