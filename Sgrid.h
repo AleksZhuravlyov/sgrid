@@ -35,17 +35,19 @@ class Sgrid {
 
 public:
 
-    Sgrid(Eigen::Ref<Eigen::Vector3i> pointsDims,
-          Eigen::Ref<Eigen::Vector3d> pointsOrigin,
-          Eigen::Ref<Eigen::Vector3d> spacing);
+    Sgrid(const std::vector<int> &pointsDims,
+          const std::vector<double> &pointsOrigin,
+          const std::vector<double> &spacing);
 
     Sgrid(const std::string &fileName);
 
     virtual ~Sgrid() = default;
 
-    /// Main methods
 
-    void save(const std::string &fileName);
+    // Users methods
+
+    void save(const std::string &fileName,
+              const bool &isStructured);
 
 
     int calculateICell(const int &iX, const int &iY, const int &iZ);
@@ -61,8 +63,7 @@ public:
 
     int calculateOffsetFace(const int &axis);
 
-    int calculateIFace(const int &axis,
-                       const int &iX, const int &iY, const int &iZ);
+    int calculateIFace(const int &axis, const int &iX, const int &iY, const int &iZ);
 
     int calculateIXFace(const int &iFace);
 
@@ -76,136 +77,17 @@ public:
     void processTypesByCellsType(const std::string &name);
 
 
-    /// Accessors and mutators
-
-    Eigen::Ref<Eigen::Vector3i> getPointsDims();
-
-    void setPointsDims(Eigen::Ref<Eigen::Vector3i> pointsDims);
-
-
-    Eigen::Ref<Eigen::Vector3d> getPointsOrigin();
-
-    void setPointsOrigin(Eigen::Ref<Eigen::Vector3d> pointsOrigin);
-
-
-    Eigen::Ref<Eigen::Vector3d> getSpacing();
-
-    void setSpacing(Eigen::Ref<Eigen::Vector3d> spacing);
-
-
-    Eigen::Ref<Eigen::Vector3i> getCellsDims();
-
-    void setCellsDims(Eigen::Ref<Eigen::Vector3i> cellsDims);
-
-
-    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getTypesCells();
-
-    void setTypesCells(
-            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesCells);
-
-
-    std::map<int, Eigen::Ref<Eigen::Vector3i>> getFacesDims();
-
-    void setFacesDims(std::map<int, Eigen::Ref<Eigen::Vector3i>> facesDims);
-
-
-    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getTypesFaces();
-
-    void setTypesFaces(
-            std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesFaces);
-
-
-    Eigen::Ref<Eigen::Vector3d> getFaceS();
-
-    void setFaceS(Eigen::Ref<Eigen::Vector3d> faceS);
-
-
-    std::map<int, Eigen::Ref<Eigen::VectorXi>> getNeighborsFaces();
-
-    void setNeighborsFaces(
-            std::map<int, Eigen::Ref<Eigen::VectorXi>> neighborsFaces);
-
-    std::map<int, Eigen::Ref<Eigen::VectorXi>> getNeighborsCells();
-
-    void setNeighborsCells(
-            std::map<int, Eigen::Ref<Eigen::VectorXi>> neighborsCells);
-
-
-    std::map<int, Eigen::Ref<Eigen::VectorXi>> getNormalsNeighborsCells();
-
-    void setNormalsNeighborsCells(
-            std::map<int, Eigen::Ref<Eigen::VectorXi>> normalsNeighborsCells);
-
-    std::map<int, Eigen::Ref<Eigen::VectorXi>> getNormalsNeighborsFaces();
-
-    void setNormalsNeighborsFaces(
-            std::map<int, Eigen::Ref<Eigen::VectorXi>> normalsNeighborsFaces);
-
-
-    std::map<std::string, Eigen::Ref<Eigen::VectorXd>> getPointsArrays();
-
-    void setPointsArrays(
-            std::map<std::string, Eigen::Ref<Eigen::VectorXd>> pointsArrays);
-
-    std::map<std::string, Eigen::Ref<Eigen::VectorXd>> getCellsArrays();
-
-    void setCellsArrays(
-            std::map<std::string, Eigen::Ref<Eigen::VectorXd>> cellsArrays);
-
-    std::map<std::string, Eigen::Ref<Eigen::VectorXd>> getFacesArrays();
-
-    void setFacesArrays(
-            std::map<std::string, Eigen::Ref<Eigen::VectorXd>> facesArrays);
-
-
-    Eigen::Map<Eigen::Vector3i> _pointsDims;
-    Eigen::Map<Eigen::Vector3d> _spacing;
-    Eigen::Map<Eigen::Vector3d> _pointsOrigin;
-
-    int _pointsN;
-
-    Eigen::Map<Eigen::Vector3i> _cellsDims;
-    int _cellsN;
-    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _typesCells;
-
-
-    std::map<int, Eigen::Map<Eigen::Vector3i>> _facesDims;
-    int _facesN;
-    std::map<int, int> _facesAxis;
-    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _typesFaces;
-
-    double _cellV;
-    Eigen::Map<Eigen::Vector3d> _faceS;
-
-    std::map<int, Eigen::Map<Eigen::VectorXi>> _neighborsFaces;
-    std::map<int, Eigen::Map<Eigen::VectorXi>> _neighborsCells;
-
-    std::map<int, Eigen::Map<Eigen::VectorXi>> _normalsNeighborsCells;
-    std::map<int, Eigen::Map<Eigen::VectorXi>> _normalsNeighborsFaces;
-
-
-    std::map<std::string, Eigen::Map<Eigen::VectorXd>> _pointsArrays;
-    std::map<std::string, Eigen::Map<Eigen::VectorXd>> _cellsArrays;
-    std::map<std::string, Eigen::Map<Eigen::VectorXd>> _facesArrays;
-
-
-    /// Accessory shitty constructor methods
-
-    void calculatePointsN();
-
-    void calculateCellsDims();
-
-    void calculateCellsN();
+    // Accessory shitty constructor methods
 
     void calculateFacesDims();
 
+    void calculateFacesNs();
+
     void calculateFacesN();
 
-    void calculateFacesAxis();
+    void calculateFacesAxes();
 
-    void calculateCellV();
-
-    void calculateFaceS();
+    void calculateFaceSs();
 
     void calculateNeighborsFaces();
 
@@ -221,6 +103,63 @@ public:
 
 
     void calculateGridProps();
+
+
+    // Eigens accessors and mutators
+
+    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getTypesCells();
+
+    void setTypesCells(std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesCells);
+
+
+    std::map<std::string, Eigen::Ref<Eigen::VectorXi>> getTypesFaces();
+
+    void setTypesFaces(std::map<std::string, Eigen::Ref<Eigen::VectorXi>> typesFaces);
+
+
+    std::map<std::string, Eigen::Ref<Eigen::VectorXd>> getPointsArrays();
+
+    void setPointsArrays(std::map<std::string, Eigen::Ref<Eigen::VectorXd>> pointsArrays);
+
+
+    std::map<std::string, Eigen::Ref<Eigen::VectorXd>> getCellsArrays();
+
+    void setCellsArrays(std::map<std::string, Eigen::Ref<Eigen::VectorXd>> cellsArrays);
+
+
+    std::map<std::string, Eigen::Ref<Eigen::VectorXd>> getFacesArrays();
+
+    void setFacesArrays(std::map<std::string, Eigen::Ref<Eigen::VectorXd>> facesArrays);
+
+
+    /// Attributes
+
+    std::vector<int> _pointsDims;
+    int _pointsN;
+    std::vector<double> _pointsOrigin;
+    std::vector<double> _spacing;
+
+    std::vector<int> _cellsDims;
+    int _cellsN;
+    double _cellV;
+    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _typesCells;
+
+    std::vector<std::vector<int>> _facesDimss;
+    std::vector<int> _facesNs;
+    int _facesN;
+    std::vector<double> _facesSs;
+    std::vector<int> _facesAxes;
+    std::map<std::string, Eigen::Map<Eigen::VectorXi>> _typesFaces;
+
+    std::map<int, std::vector<int>> _neighborsFaces;
+    std::map<int, std::vector<int>> _neighborsCells;
+
+    std::map<int, std::vector<int>> _normalsNeighborsCells;
+    std::map<int, std::vector<int>> _normalsNeighborsFaces;
+
+    std::map<std::string, Eigen::Map<Eigen::VectorXd>> _pointsArrays;
+    std::map<std::string, Eigen::Map<Eigen::VectorXd>> _cellsArrays;
+    std::map<std::string, Eigen::Map<Eigen::VectorXd>> _facesArrays;
 
 
 };
