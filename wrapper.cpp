@@ -41,7 +41,10 @@ PYBIND11_MODULE(sgrid_bind, m) {
                          const std::vector<double>>(),
                  "points_dims"_a, "points_origin"_a, "spacing"_a)
 
-            .def("save", &Sgrid::save, "file_name"_a, "isStructured"_a=false)
+            .def("save_cells", &Sgrid::saveCells, "file_name"_a)
+            .def("save_faces", &Sgrid::saveFaces, "file_name"_a)
+
+            .def("calculate_i_node", &Sgrid::calculateINode, "i_x"_a, "i_y"_a, "i_z"_a)
 
             .def("calculate_i_cell", &Sgrid::calculateICell, "i_x"_a, "i_y"_a, "i_z"_a)
             .def("calculate_i_x_cell", &Sgrid::calculateIXCell, "i_cell"_a)
@@ -65,8 +68,11 @@ PYBIND11_MODULE(sgrid_bind, m) {
             .def_readwrite("points_origin", &Sgrid::_pointsOrigin)
             .def_readwrite("spacing", &Sgrid::_spacing)
 
+            .def_readwrite("nodes_coordinates", &Sgrid::_nodesCoordinates)
+
             .def_readwrite("cells_dims", &Sgrid::_cellsDims)
             .def_readwrite("cells_N", &Sgrid::_cellsN)
+            .def_readwrite("cells_nodes", &Sgrid::_cellsNodes)
             .def_readwrite("cell_V", &Sgrid::_cellV)
             .def_property("types_cells",
                           &Sgrid::getTypesCells, &Sgrid::setTypesCells)
@@ -74,6 +80,8 @@ PYBIND11_MODULE(sgrid_bind, m) {
             .def_readwrite("faces_dimss", &Sgrid::_facesDimss)
             .def_readwrite("faces_Ns", &Sgrid::_facesNs)
             .def_readwrite("faces_N", &Sgrid::_facesN)
+            .def_readwrite("faces_nodes", &Sgrid::_facesNodes)
+
             .def_readwrite("faces_Ss", &Sgrid::_facesSs)
             .def_readwrite("faces_axes", &Sgrid::_facesAxes)
             .def_property("types_faces",

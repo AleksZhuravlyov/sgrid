@@ -49,8 +49,14 @@ public:
 
     // Users methods
 
-    void save(const std::string &fileName,
-              const bool &isStructured);
+    void save(const std::string &fileName, const std::string &type);
+
+    void saveCells(const std::string &fileName);
+
+    void saveFaces(const std::string &fileName);
+
+
+    uint64_t calculateINode(const uint16_t &iX, const uint16_t &iY, const uint16_t &iZ);
 
 
     uint64_t calculateICell(const uint16_t &iX, const uint16_t &iY, const uint16_t &iZ);
@@ -66,7 +72,8 @@ public:
 
     uint64_t calculateOffsetFace(const uint8_t &axis);
 
-    uint64_t calculateIFace(const uint8_t &axis, const uint16_t &iX, const uint16_t &iY, const uint16_t &iZ);
+    uint64_t calculateIFace(const uint8_t &axis, const uint16_t &iX, const uint16_t &iY,
+                            const uint16_t &iZ);
 
     uint16_t calculateIXFace(const uint64_t &iFace);
 
@@ -81,6 +88,10 @@ public:
 
 
     // Accessory shitty constructor methods
+
+    void calculateNodesCoordinates();
+
+    void calculateCellsNodes();
 
     void calculateFacesDimss();
 
@@ -142,14 +153,18 @@ public:
     std::vector<double> _pointsOrigin;
     std::vector<double> _spacing;
 
+    std::vector<double> _nodesCoordinates;
+
     std::vector<uint16_t> _cellsDims;
     uint64_t _cellsN;
+    std::map<uint64_t, std::vector<uint64_t>> _cellsNodes;
     double _cellV;
     std::map<std::string, Eigen::Map<Eigen::VectorXui64>> _typesCells;
 
     std::vector<std::vector<uint16_t>> _facesDimss;
     std::vector<uint64_t> _facesNs;
     uint64_t _facesN;
+    std::map<uint64_t, std::vector<uint64_t>> _facesNodes;
     std::vector<double> _facesSs;
     std::vector<uint8_t> _facesAxes;
     std::map<std::string, Eigen::Map<Eigen::VectorXui64>> _typesFaces;

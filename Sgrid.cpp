@@ -53,6 +53,13 @@ Sgrid::Sgrid(const std::vector<uint16_t> &pointsDims,
 
 // Users methods
 
+uint64_t Sgrid::calculateINode(const uint16_t &iX,
+                               const uint16_t &iY,
+                               const uint16_t &iZ) {
+    return iX + iY * _pointsDims[0] + iZ * _pointsDims[0] * _pointsDims[1];
+}
+
+
 uint64_t Sgrid::calculateICell(const uint16_t &iX,
                                const uint16_t &iY,
                                const uint16_t &iZ) {
@@ -187,11 +194,45 @@ void Sgrid::processTypesByCellsType(const std::string &name) {
                                           _typesCells.at(name + "_nonbound"));
     }
 
-
 }
 
 
 // Accessory shitty constructor methods
+
+void Sgrid::calculateNodesCoordinates() {
+    _nodesCoordinates.resize(_pointsN * 3);
+    for (int k = 0; k < _pointsDims[2]; k++)
+        for (int j = 0; j < _pointsDims[1]; j++)
+            for (int i = 0; i < _pointsDims[0]; i++) {
+                int ind = i + j * _pointsDims[0] + k * _pointsDims[0] * _pointsDims[1];
+                _nodesCoordinates[ind * 3] = _pointsOrigin[0] + _spacing[0] * i;
+                _nodesCoordinates[ind * 3 + 1] = _pointsOrigin[1] + _spacing[1] * j;
+                _nodesCoordinates[ind * 3 + 2] = _pointsOrigin[2] + _spacing[2] * k;
+            }
+}
+
+
+void Sgrid::calculateCellsNodes() {
+
+    for (uint64_t iCell = 0; iCell < _cellsN; iCell++) {
+        auto iXCell = calculateIXCell(iCell);
+        auto iYCell = calculateIYCell(iCell);
+        auto iZCell = calculateIZCell(iCell);
+
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 0, iYCell + 0, iZCell + 0));
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 0, iYCell + 1, iZCell + 0));
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 0, iYCell + 1, iZCell + 1));
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 0, iYCell + 0, iZCell + 1));
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 1, iYCell + 0, iZCell + 0));
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 1, iYCell + 1, iZCell + 0));
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 1, iYCell + 1, iZCell + 1));
+        _cellsNodes[iCell].push_back(calculateINode(iXCell + 1, iYCell + 0, iZCell + 1));
+
+    }
+
+
+}
+
 
 void Sgrid::calculateFacesDimss() {
     for (int8_t i = 0; i < 3; ++i) {
@@ -568,6 +609,10 @@ void Sgrid::calculateMainTypesFaces() {
 
 
 void Sgrid::calculateGridProps() {
+
+    calculateNodesCoordinates();
+
+    calculateCellsNodes();
 
     calculateFacesDimss();
     calculateFacesNs();

@@ -28,37 +28,16 @@
 #include <vtkCell.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
-#include <vtkStructuredGrid.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkPointData.h>
-#include <vtkStructuredGridGeometryFilter.h>
-#include <vtkXMLStructuredGridWriter.h>
-#include <vtkXMLStructuredGridReader.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkThreshold.h>
+
 
 #include <pugixml.hpp>
 
-void Sgrid::save(const std::string &fileName,
-                 const bool &isStructured=false) {
+void Sgrid::save(const std::string &fileName, const std::string &type) {
 
-    // Create VtkStructuredGrid
-
-    auto structuredGrid = vtkSmartPointer<vtkStructuredGrid>::New();
-    structuredGrid->SetDimensions(_pointsDims[0], _pointsDims[1], _pointsDims[2]);
-
-    // Create point and incorporate it into VtkStructuredGrid
-
-    auto xyzPtr = new double[_pointsN * 3];
-    for (int k = 0; k < _pointsDims[2]; k++)
-        for (int j = 0; j < _pointsDims[1]; j++)
-            for (int i = 0; i < _pointsDims[0]; i++) {
-                int scalarInd =
-                        i + j * _pointsDims[0] + k * _pointsDims[0] * _pointsDims[1];
-                xyzPtr[scalarInd * 3] = _pointsOrigin[0] + _spacing[0] * i;
-                xyzPtr[scalarInd * 3 + 1] = _pointsOrigin[1] + _spacing[1] * j;
-                xyzPtr[scalarInd * 3 + 2] = _pointsOrigin[2] + _spacing[2] * k;
-            }
-
+    auto unstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 
     auto xyz = vtkSmartPointer<vtkDoubleArray>::New();
     xyz->SetNumberOfComponents(3);
@@ -67,76 +46,55 @@ void Sgrid::save(const std::string &fileName,
     xyz->SetComponentName(0, "x");
     xyz->SetComponentName(1, "y");
     xyz->SetComponentName(2, "z");
-    xyz->SetArray(xyzPtr, xyz->GetDataSize(), 1);
-
+    xyz->SetArray(_nodesCoordinates.data(), _nodesCoordinates.size(), 1);
 
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetDataTypeToDouble();
     points->SetData(xyz);
-    structuredGrid->SetPoints(points);
+    unstructuredGrid->SetPoints(points);
 
+    if (type == "cells") {
 
-    // Add arrays to points and cells
+        std::vector<std::vector<vtkIdType>> vtkCellNodes;
+        for (auto const&[cell, nodes] : _cellsNodes) {
+            vtkCellNodes.emplace_back();
+            for (auto const &node : nodes)
+                vtkCellNodes.back().push_back(node);
+        }
 
-    for (auto &ent : _pointsArrays) {
-        auto array = vtkSmartPointer<vtkDoubleArray>::New();
-        array->SetNumberOfComponents(1);
-        array->SetNumberOfTuples(_pointsN);
-        array->SetName(ent.first.c_str());
-        array->SetArray(_pointsArrays.at(ent.first).data(), _pointsN, 1);
-        structuredGrid->GetPointData()->AddArray(array);
-    }
+        unstructuredGrid->Allocate(_cellsN);
+        for (auto const &cellNodes : vtkCellNodes)
+            unstructuredGrid->InsertNextCell(VTK_HEXAHEDRON, 8, cellNodes.data());
 
-    for (auto &ent : _cellsArrays) {
-        auto array = vtkSmartPointer<vtkDoubleArray>::New();
-        array->SetNumberOfComponents(1);
-        array->SetNumberOfTuples(_cellsN);
-        array->SetName(ent.first.c_str());
-        array->SetArray(_cellsArrays.at(ent.first).data(), _cellsN, 1);
-        structuredGrid->GetCellData()->AddArray(array);
-    }
+        for (auto &ent : _cellsArrays) {
+            auto array = vtkSmartPointer<vtkDoubleArray>::New();
+            array->SetNumberOfComponents(1);
+            array->SetNumberOfTuples(_cellsN);
+            array->SetName(ent.first.c_str());
+            array->SetArray(_cellsArrays.at(ent.first).data(), _cellsN, 1);
+            unstructuredGrid->GetCellData()->AddArray(array);
+        }
 
-
-    if (isStructured) {
-
-        // Write VtkStructuredGrid to a file
-
-        auto structuredGridWriter = vtkSmartPointer<vtkXMLStructuredGridWriter>::New();
-        structuredGridWriter->SetFileName(fileName.c_str());
-        structuredGridWriter->SetInputData(structuredGrid);
-        structuredGridWriter->SetDataModeToAscii();
-        structuredGridWriter->Write();
-
-    } else {
-
-        // Converts VtkStructuredGrid into VtkUnstructuredGrid
-
-        // Add just scalar to the points
-        auto scalarsPointsPtr = new int[_pointsN];
-        for (int i = 0; i < _pointsN; i++)
-            scalarsPointsPtr[i] = 0;
-        auto scalarsPoints = vtkSmartPointer<vtkIntArray>::New();
-        scalarsPoints->SetNumberOfComponents(1);
-        scalarsPoints->SetNumberOfTuples(_pointsN);
-        scalarsPoints->SetName("scalar");
-        scalarsPoints->SetArray(scalarsPointsPtr, _pointsN, 1);
-        structuredGrid->GetPointData()->SetScalars(scalarsPoints);
-
-        auto threshold = vtkSmartPointer<vtkThreshold>::New();
-        threshold->SetInputData(structuredGrid);
-        threshold->ThresholdByUpper(-1);
-        threshold->Update();
-
-        // Write vtkUnstructuredGrid to a file
-
-        auto unstructuredGridWriter = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-        unstructuredGridWriter->SetFileName(fileName.c_str());
-        unstructuredGridWriter->SetDataModeToAscii();
-        unstructuredGridWriter->SetInputConnection(threshold->GetOutputPort());
-        unstructuredGridWriter->Write();
+    } else if (type == "faces") {
 
     }
 
+
+    auto unstructuredGridWriter = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+    unstructuredGridWriter->SetFileName(fileName.c_str());
+    unstructuredGridWriter->SetInputData(unstructuredGrid);
+    unstructuredGridWriter->SetDataModeToAscii();
+    unstructuredGridWriter->Write();
+
+
+}
+
+void Sgrid::saveCells(const std::string &fileName) {
+    save(fileName, "cells");
+}
+
+void Sgrid::saveFaces(const std::string &fileName) {
+    save(fileName, "faces");
 }
 
 

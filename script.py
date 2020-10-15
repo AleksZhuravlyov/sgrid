@@ -30,11 +30,14 @@ sys.path.append(os.path.join(current_path, '../'))
 
 from sgrid import Sgrid
 
-points_dims = [4, 3, 2]
+points_dims = [5, 4, 3]
 points_origin = [0., 0., 0.]
 spacing = [1., 1., 1.]
 
 sgrid = Sgrid(points_dims, points_origin, spacing)
+
+sgrid.cells_arrays = {'sells': np.arange(sgrid.cells_N, dtype=np.float64)}
+sgrid.faces_arrays = {'faces': np.arange(sgrid.faces_N, dtype=np.float64)}
 
 print('points_dims', sgrid.points_dims)
 print('points_N', sgrid.points_N)
@@ -64,6 +67,4 @@ print('cells_arrays', sgrid.cells_arrays)
 print('faces_arrays', sgrid.faces_arrays)
 print()
 
-sgrid.save('unstructured.vtu')
-sgrid.save('structured.vtu', True)
-
+sgrid.save_cells('sgrid.vtu')
