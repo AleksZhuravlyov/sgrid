@@ -193,7 +193,7 @@ void Sgrid::processTypesByCellsType(const std::string &name) {
 
 // Accessory shitty constructor methods
 
-void Sgrid::calculateFacessDims() {
+void Sgrid::calculateFacesDimss() {
     for (int8_t i = 0; i < 3; ++i) {
         auto dims = _pointsDims;
         dims[(i + 2) % 3] -= 1;
@@ -569,7 +569,7 @@ void Sgrid::calculateMainTypesFaces() {
 
 void Sgrid::calculateGridProps() {
 
-    calculateFacessDims();
+    calculateFacesDimss();
     calculateFacesNs();
     calculateFacesN();
     calculateFacesAxes();

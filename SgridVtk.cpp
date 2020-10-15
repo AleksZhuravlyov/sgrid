@@ -140,67 +140,6 @@ void Sgrid::save(const std::string &fileName,
 }
 
 
-Sgrid::Sgrid(const std::string &fileName) {
-
-    // Read VtkStructuredGrid from a file
-
-    auto reader = vtkSmartPointer<vtkXMLStructuredGridReader>::New();
-    reader->SetFileName(fileName.c_str());
-    reader->Update();
-    auto structuredGrid = reader->GetOutput();
-
-    auto dims = structuredGrid->GetDimensions();
-
-    _pointsDims = {uint16_t(dims[0]), uint16_t(dims[1]), uint16_t(dims[2])};
-
-
-
-    _pointsN = _pointsDims[0] * _pointsDims[1] * _pointsDims[2];
-
-    auto xyz = static_cast<double *>(structuredGrid->GetPoints()->GetData()->
-            GetVoidPointer(0));
-
-    _pointsOrigin = {xyz[0], xyz[1], xyz[2]};
-    _spacing = {xyz[3] - xyz[0],
-                xyz[_pointsDims[0] * 3 + 1] - xyz[1],
-                xyz[_pointsDims[0] * _pointsDims[1] * 3 + 2] - xyz[2]};
-
-    _cellsDims = {uint16_t(_pointsDims[0] - 1),
-                  uint16_t(_pointsDims[1] - 1),
-                  uint16_t(_pointsDims[2] - 1)};
-    _cellsN = (_pointsDims[0] - 1) * (_pointsDims[1] - 1) * (_pointsDims[2] - 1);
-    _cellV = _spacing[0] * _spacing[1] * _spacing[2];
-
-
-    calculateGridProps();
-
-    auto pointsArraysN = structuredGrid->GetPointData()->GetNumberOfArrays();
-    for (int i = 0; i < pointsArraysN; i++) {
-        auto arrayName = structuredGrid->GetPointData()->GetArrayName(i);
-        auto arrayPtr = static_cast<double *>(
-                structuredGrid->GetPointData()->GetArray(arrayName)->GetVoidPointer(0));
-
-        auto vectorXd = Eigen::Map<Eigen::VectorXd>(new double[_pointsN], _pointsN);
-        vectorXd = Eigen::Map<Eigen::VectorXd>(arrayPtr, _pointsN);
-        _pointsArrays.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXd>>(
-                arrayName, vectorXd));
-    }
-
-    auto cellsArraysN = structuredGrid->GetCellData()->GetNumberOfArrays();
-    for (int i = 0; i < cellsArraysN; i++) {
-        auto arrayName = structuredGrid->GetCellData()->GetArrayName(i);
-        auto arrayPtr = static_cast<double *>(
-                structuredGrid->GetCellData()->GetArray(arrayName)->GetVoidPointer(0));
-
-        auto vectorXd = Eigen::Map<Eigen::VectorXd>(new double[_cellsN], _cellsN);
-        vectorXd = Eigen::Map<Eigen::VectorXd>(arrayPtr, _cellsN);
-        _cellsArrays.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXd>>(
-                arrayName, vectorXd));
-    }
-
-}
-
-
 void saveFilesCollectionToFile(const std::string &fileName,
                                const std::vector<std::string> &filesNames,
                                const std::vector<std::string> &filesDescriptions) {

@@ -41,8 +41,6 @@ PYBIND11_MODULE(sgrid_bind, m) {
                          const std::vector<double>>(),
                  "points_dims"_a, "points_origin"_a, "spacing"_a)
 
-            .def(py::init<std::string>(), "file_name"_a)
-
             .def("save", &Sgrid::save, "file_name"_a, "isStructured"_a=false)
 
             .def("calculate_i_cell", &Sgrid::calculateICell, "i_x"_a, "i_y"_a, "i_z"_a)

@@ -44,8 +44,6 @@ public:
           const std::vector<double> &pointsOrigin,
           const std::vector<double> &spacing);
 
-    Sgrid(const std::string &fileName);
-
     virtual ~Sgrid() = default;
 
 
@@ -84,7 +82,7 @@ public:
 
     // Accessory shitty constructor methods
 
-    void calculateFacessDims();
+    void calculateFacesDimss();
 
     void calculateFacesNs();
 

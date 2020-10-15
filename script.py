@@ -67,5 +67,3 @@ print()
 sgrid.save('unstructured.vtu')
 sgrid.save('structured.vtu', True)
 
-sgrid_read = Sgrid('structured.vtu')
-print('sgrid_read.cells_dims', sgrid_read.cells_dims)
