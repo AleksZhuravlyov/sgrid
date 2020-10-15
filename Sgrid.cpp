@@ -215,6 +215,7 @@ void Sgrid::calculateNodesCoordinates() {
 void Sgrid::calculateCellsNodes() {
 
     for (uint64_t iCell = 0; iCell < _cellsN; iCell++) {
+
         auto iXCell = calculateIXCell(iCell);
         auto iYCell = calculateIYCell(iCell);
         auto iZCell = calculateIZCell(iCell);
@@ -229,7 +230,6 @@ void Sgrid::calculateCellsNodes() {
         _cellsNodes[iCell].push_back(calculateINode(iXCell + 1, iYCell + 0, iZCell + 1));
 
     }
-
 
 }
 
@@ -269,6 +269,40 @@ void Sgrid::calculateFaceSs() {
     _facesSs = {_spacing[1] * _spacing[2],
                 _spacing[0] * _spacing[2],
                 _spacing[0] * _spacing[1]};
+}
+
+void Sgrid::calculateFacesNodes() {
+
+    for (uint64_t iFace = 0; iFace < _facesN; iFace++) {
+
+        auto axis = calculateAxisFace(iFace);
+        auto iX = calculateIXFace(iFace);
+        auto iY = calculateIYFace(iFace);
+        auto iZ = calculateIZFace(iFace);
+
+        std::vector<uint64_t> nodes(4);
+
+        if (axis == 0) {
+            nodes[0] = calculateINode(iX + 0, iY + 0, iZ + 0);
+            nodes[1] = calculateINode(iX + 0, iY + 1, iZ + 0);
+            nodes[2] = calculateINode(iX + 0, iY + 1, iZ + 1);
+            nodes[3] = calculateINode(iX + 0, iY + 0, iZ + 1);
+        } else if (axis == 1) {
+            nodes[0] = calculateINode(iX + 0, iY + 0, iZ + 0);
+            nodes[1] = calculateINode(iX + 1, iY + 0, iZ + 0);
+            nodes[2] = calculateINode(iX + 1, iY + 0, iZ + 1);
+            nodes[3] = calculateINode(iX + 0, iY + 0, iZ + 1);
+        }
+        else if (axis == 2) {
+            nodes[0] = calculateINode(iX + 0, iY + 0, iZ + 0);
+            nodes[1] = calculateINode(iX + 1, iY + 0, iZ + 0);
+            nodes[2] = calculateINode(iX + 1, iY + 1, iZ + 0);
+            nodes[3] = calculateINode(iX + 0, iY + 1, iZ + 0);
+        }
+
+        _facesNodes[iFace] = nodes;
+    }
+
 }
 
 void Sgrid::calculateNeighborsFaces() {
@@ -619,6 +653,7 @@ void Sgrid::calculateGridProps() {
     calculateFacesN();
     calculateFacesAxes();
     calculateFaceSs();
+    calculateFacesNodes();
 
     calculateNeighborsFaces();
     calculateNeighborsCells();

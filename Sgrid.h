@@ -103,6 +103,8 @@ public:
 
     void calculateFaceSs();
 
+    void calculateFacesNodes();
+
     void calculateNeighborsFaces();
 
     void calculateNeighborsCells();

@@ -77,6 +77,26 @@ void Sgrid::save(const std::string &fileName, const std::string &type) {
 
     } else if (type == "faces") {
 
+        std::vector<std::vector<vtkIdType>> vtkFaceNodes;
+        for (auto const&[cell, nodes] : _facesNodes) {
+            vtkFaceNodes.emplace_back();
+            for (auto const &node : nodes)
+                vtkFaceNodes.back().push_back(node);
+        }
+
+        unstructuredGrid->Allocate(_cellsN);
+        for (auto const &faceNodes : vtkFaceNodes)
+            unstructuredGrid->InsertNextCell(VTK_QUAD, 4, faceNodes.data());
+
+        for (auto &ent : _facesArrays) {
+            auto array = vtkSmartPointer<vtkDoubleArray>::New();
+            array->SetNumberOfComponents(1);
+            array->SetNumberOfTuples(_facesN);
+            array->SetName(ent.first.c_str());
+            array->SetArray(_facesArrays.at(ent.first).data(), _facesN, 1);
+            unstructuredGrid->GetCellData()->AddArray(array);
+        }
+
     }
 
 

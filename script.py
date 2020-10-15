@@ -67,4 +67,5 @@ print('cells_arrays', sgrid.cells_arrays)
 print('faces_arrays', sgrid.faces_arrays)
 print()
 
-sgrid.save_cells('sgrid.vtu')
+sgrid.save_cells('cells.vtu')
+sgrid.save_faces('faces.vtu')
