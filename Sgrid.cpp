@@ -162,23 +162,37 @@ void Sgrid::processTypesByCellsType(const std::string &name) {
 
 
     std::set<uint64_t> cellsNeighborBound;
-    for (auto &face : facesBound)
+    std::set<uint64_t> cellsNeighborBound1D;
+    for (auto &face : facesBound) {
         for (auto &cell : _neighborsCells[face])
             cellsNeighborBound.insert(cell);
+        if (_cellsDims[calculateAxisFace(face)] != 1)
+            for (auto &cell : _neighborsCells[face])
+                cellsNeighborBound1D.insert(cell);
+    }
 
     std::set<uint64_t> cells;
     for (int i = 0; i < _typesCells.at(name).size(); i++)
         cells.insert(_typesCells.at(name)(i));
 
     std::set<uint64_t> cellsBound;
+    std::set<uint64_t> cellsBound1D;
     std::set_intersection(cells.begin(), cells.end(),
                           cellsNeighborBound.begin(), cellsNeighborBound.end(),
                           std::inserter(cellsBound, cellsBound.begin()));
+    std::set_intersection(cells.begin(), cells.end(),
+                          cellsNeighborBound1D.begin(), cellsNeighborBound1D.end(),
+                          std::inserter(cellsBound1D, cellsBound1D.begin()));
+
 
     std::set<uint64_t> cellsNonbound;
+    std::set<uint64_t> cellsNonbound1D;
     std::set_difference(cells.begin(), cells.end(),
                         cellsBound.begin(), cellsBound.end(),
                         std::inserter(cellsNonbound, cellsNonbound.begin()));
+    std::set_difference(cells.begin(), cells.end(),
+                        cellsBound1D.begin(), cellsBound1D.end(),
+                        std::inserter(cellsNonbound1D, cellsNonbound1D.begin()));
 
 
     _typesCells.erase(name + "_bound");
@@ -186,13 +200,23 @@ void Sgrid::processTypesByCellsType(const std::string &name) {
             name + "_bound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
     copyStdSetToEigenVector<uint64_t>(cellsBound, _typesCells.at(name + "_bound"));
 
+    _typesCells.erase(name + "_bound_1D");
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
+            name + "_bound_1D", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
+    copyStdSetToEigenVector<uint64_t>(cellsBound1D, _typesCells.at(name + "_bound_1D"));
+
+
     _typesCells.erase(name + "_nonbound");
-    if (!cellsNonbound.empty()) {
-        _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
-                name + "_nonbound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
-        copyStdSetToEigenVector<uint64_t>(cellsNonbound,
-                                          _typesCells.at(name + "_nonbound"));
-    }
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
+            name + "_nonbound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
+    copyStdSetToEigenVector<uint64_t>(cellsNonbound,
+                                      _typesCells.at(name + "_nonbound"));
+
+    _typesCells.erase(name + "_nonbound_1D");
+    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
+            name + "_nonbound_1D", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
+    copyStdSetToEigenVector<uint64_t>(cellsNonbound1D,
+                                      _typesCells.at(name + "_nonbound_1D"));
 
 }
 
@@ -292,8 +316,7 @@ void Sgrid::calculateFacesNodes() {
             nodes[1] = calculateINode(iX + 1, iY + 0, iZ + 0);
             nodes[2] = calculateINode(iX + 1, iY + 0, iZ + 1);
             nodes[3] = calculateINode(iX + 0, iY + 0, iZ + 1);
-        }
-        else if (axis == 2) {
+        } else if (axis == 2) {
             nodes[0] = calculateINode(iX + 0, iY + 0, iZ + 0);
             nodes[1] = calculateINode(iX + 1, iY + 0, iZ + 0);
             nodes[2] = calculateINode(iX + 1, iY + 1, iZ + 0);

@@ -30,7 +30,7 @@ sys.path.append(os.path.join(current_path, '../'))
 
 from sgrid import Sgrid
 
-points_dims = [5, 4, 3]
+points_dims = [8, 2, 2]
 points_origin = [0., 0., 0.]
 spacing = [1., 1., 1.]
 
@@ -65,6 +65,18 @@ print()
 print('points_arrays', sgrid.points_arrays)
 print('cells_arrays', sgrid.cells_arrays)
 print('faces_arrays', sgrid.faces_arrays)
+print()
+print('nonbound', sgrid.types_cells['nonbound'])
+print('nonbound_1D', sgrid.types_cells['nonbound_1D'])
+print()
+active_cells = np.arange(sgrid.cells_N, dtype=np.uint64)
+sgrid.set_cells_type('active', active_cells)
+sgrid.process_type_by_cells_type('active')
+print('active', sgrid.types_cells['active'])
+print('active_bound', sgrid.types_cells['active_bound'])
+print('active_nonbound', sgrid.types_cells['active_nonbound'])
+print('active_bound_1D', sgrid.types_cells['active_bound_1D'])
+print('active_nonbound_1D', sgrid.types_cells['active_nonbound_1D'])
 print()
 
 sgrid.save_cells('cells.vtu')
