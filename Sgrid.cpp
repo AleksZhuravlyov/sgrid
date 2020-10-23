@@ -410,10 +410,6 @@ void Sgrid::calculateMainTypesCells() {
     bool isY1D = (_cellsDims[1] == 1);
     bool isZ1D = (_cellsDims[2] == 1);
 
-    if (isX1D or isY1D or isZ1D)
-        _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
-                "nonbound_1D", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
-
 
     std::vector<uint64_t> left;
     std::vector<uint64_t> right;
@@ -465,9 +461,6 @@ void Sgrid::calculateMainTypesCells() {
             isIYCellNonbound and isIZCellNonbound)
             nonbound.push_back(iCell);
 
-        if ((isIXCellNonbound or isX1D) and
-            (isIYCellNonbound or isY1D) and (isIZCellNonbound or isZ1D))
-            nonbound1D.push_back(iCell);
 
     }
 
@@ -479,8 +472,6 @@ void Sgrid::calculateMainTypesCells() {
     copyStdVectotToEigenVector<uint64_t>(top, _typesCells.at("top"));
 
     copyStdVectotToEigenVector<uint64_t>(nonbound, _typesCells.at("nonbound"));
-    if (isX1D or isY1D or isZ1D)
-        copyStdVectotToEigenVector<uint64_t>(nonbound1D, _typesCells.at("nonbound_1D"));
 
 }
 
@@ -498,7 +489,6 @@ void Sgrid::calculateMainTypesFaces() {
             "bottom", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
             "top", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
-
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
             "nonbound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
 
@@ -641,9 +631,7 @@ void Sgrid::calculateMainTypesFaces() {
     copyStdVectotToEigenVector<uint64_t>(back, _typesFaces.at("back"));
     copyStdVectotToEigenVector<uint64_t>(bottom, _typesFaces.at("bottom"));
     copyStdVectotToEigenVector<uint64_t>(top, _typesFaces.at("top"));
-
-    if (!nonboundSet.empty())
-        copyStdSetToEigenVector<uint64_t>(nonboundSet, _typesFaces.at("nonbound"));
+    copyStdSetToEigenVector<uint64_t>(nonboundSet, _typesFaces.at("nonbound"));
 
 }
 
