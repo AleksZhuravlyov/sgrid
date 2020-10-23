@@ -147,76 +147,59 @@ void Sgrid::processTypesByCellsType(const std::string &name) {
 
 
     _typesFaces.erase(name + "_bound");
-
     _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
             name + "_bound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
     copyStdSetToEigenVector<uint64_t>(facesBound, _typesFaces.at(name + "_bound"));
 
     _typesFaces.erase(name + "_nonbound");
-    if (!facesNonbound.empty()) {
-        _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
-                name + "_nonbound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
-        copyStdSetToEigenVector<uint64_t>(facesNonbound,
-                                          _typesFaces.at(name + "_nonbound"));
-    }
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
+            name + "_nonbound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
+    copyStdSetToEigenVector<uint64_t>(facesNonbound, _typesFaces.at(name + "_nonbound"));
+
+
+    std::set<uint64_t> faces;
+    std::set_union(facesBound.begin(), facesBound.end(),
+                   facesNonbound.begin(), facesNonbound.end(),
+                   std::inserter(faces, faces.begin()));
+
+    _typesFaces.erase(name);
+    _typesFaces.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
+            name, Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
+    copyStdSetToEigenVector<uint64_t>(faces, _typesFaces.at(name));
 
 
     std::set<uint64_t> cellsNeighborBound;
-    std::set<uint64_t> cellsNeighborBound1D;
-    for (auto &face : facesBound) {
-        for (auto &cell : _neighborsCells[face])
-            cellsNeighborBound.insert(cell);
+    for (auto &face : facesBound)
         if (_cellsDims[calculateAxisFace(face)] != 1)
             for (auto &cell : _neighborsCells[face])
-                cellsNeighborBound1D.insert(cell);
-    }
+                cellsNeighborBound.insert(cell);
 
     std::set<uint64_t> cells;
     for (int i = 0; i < _typesCells.at(name).size(); i++)
         cells.insert(_typesCells.at(name)(i));
 
+
     std::set<uint64_t> cellsBound;
-    std::set<uint64_t> cellsBound1D;
     std::set_intersection(cells.begin(), cells.end(),
                           cellsNeighborBound.begin(), cellsNeighborBound.end(),
                           std::inserter(cellsBound, cellsBound.begin()));
-    std::set_intersection(cells.begin(), cells.end(),
-                          cellsNeighborBound1D.begin(), cellsNeighborBound1D.end(),
-                          std::inserter(cellsBound1D, cellsBound1D.begin()));
-
-
-    std::set<uint64_t> cellsNonbound;
-    std::set<uint64_t> cellsNonbound1D;
-    std::set_difference(cells.begin(), cells.end(),
-                        cellsBound.begin(), cellsBound.end(),
-                        std::inserter(cellsNonbound, cellsNonbound.begin()));
-    std::set_difference(cells.begin(), cells.end(),
-                        cellsBound1D.begin(), cellsBound1D.end(),
-                        std::inserter(cellsNonbound1D, cellsNonbound1D.begin()));
-
 
     _typesCells.erase(name + "_bound");
     _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
             name + "_bound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
     copyStdSetToEigenVector<uint64_t>(cellsBound, _typesCells.at(name + "_bound"));
 
-    _typesCells.erase(name + "_bound_1D");
-    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
-            name + "_bound_1D", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
-    copyStdSetToEigenVector<uint64_t>(cellsBound1D, _typesCells.at(name + "_bound_1D"));
 
+    std::set<uint64_t> cellsNonbound;
+    std::set_difference(cells.begin(), cells.end(),
+                        cellsBound.begin(), cellsBound.end(),
+                        std::inserter(cellsNonbound, cellsNonbound.begin()));
 
     _typesCells.erase(name + "_nonbound");
     _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
             name + "_nonbound", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
     copyStdSetToEigenVector<uint64_t>(cellsNonbound,
                                       _typesCells.at(name + "_nonbound"));
-
-    _typesCells.erase(name + "_nonbound_1D");
-    _typesCells.insert(std::pair<std::string, Eigen::Map<Eigen::VectorXui64>>(
-            name + "_nonbound_1D", Eigen::Map<Eigen::VectorXui64>(new uint64_t[1], 1)));
-    copyStdSetToEigenVector<uint64_t>(cellsNonbound1D,
-                                      _typesCells.at(name + "_nonbound_1D"));
 
 }
 
