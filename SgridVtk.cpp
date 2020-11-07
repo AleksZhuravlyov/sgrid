@@ -84,7 +84,7 @@ void Sgrid::save(const std::string &fileName, const std::string &type) {
                 vtkFaceNodes.back().push_back(node);
         }
 
-        unstructuredGrid->Allocate(_cellsN);
+        unstructuredGrid->Allocate(_facesN);
         for (auto const &faceNodes : vtkFaceNodes)
             unstructuredGrid->InsertNextCell(VTK_QUAD, 4, faceNodes.data());
 
