@@ -218,6 +218,11 @@ void Sgrid::calculateNodesCoordinates() {
             }
 }
 
+void Sgrid::calculatePointsNodes() {
+    for (uint64_t iPoint = 0; iPoint < _pointsN; iPoint++)
+        _pointsNodes[iPoint].push_back(iPoint);
+}
+
 
 void Sgrid::calculateCellsNodes() {
 
@@ -639,6 +644,8 @@ void Sgrid::calculateMainTypesFaces() {
 void Sgrid::calculateGridProps() {
 
     calculateNodesCoordinates();
+
+    calculatePointsNodes();
 
     calculateCellsNodes();
 

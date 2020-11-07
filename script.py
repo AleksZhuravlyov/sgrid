@@ -36,8 +36,13 @@ spacing = [1., 1., 1.]
 
 sgrid = Sgrid(points_dims, points_origin, spacing)
 
-sgrid.cells_arrays = {'sells': np.arange(sgrid.cells_N, dtype=np.float64)}
-sgrid.faces_arrays = {'faces': np.arange(sgrid.faces_N, dtype=np.float64)}
+cells_arrays = {'sells': np.arange(sgrid.cells_N, dtype=np.float64)}
+faces_arrays = {'faces': np.arange(sgrid.faces_N, dtype=np.float64)}
+points_arrays = {'points': np.arange(sgrid.points_N, dtype=np.float64)}
+
+sgrid.cells_arrays = cells_arrays
+sgrid.faces_arrays = faces_arrays
+sgrid.points_arrays = points_arrays
 
 print('points_dims', sgrid.points_dims)
 print('points_N', sgrid.points_N)

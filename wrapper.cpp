@@ -70,6 +70,8 @@ PYBIND11_MODULE(sgrid_bind, m) {
 
             .def_readwrite("nodes_coordinates", &Sgrid::_nodesCoordinates)
 
+            .def_readwrite("points_nodes", &Sgrid::_pointsNodes)
+
             .def_readwrite("cells_dims", &Sgrid::_cellsDims)
             .def_readwrite("cells_N", &Sgrid::_cellsN)
             .def_readwrite("cells_nodes", &Sgrid::_cellsNodes)
@@ -99,6 +101,7 @@ PYBIND11_MODULE(sgrid_bind, m) {
                           &Sgrid::setCellsArrays)
             .def_property("faces_arrays", &Sgrid::getFacesArrays,
                           &Sgrid::setFacesArrays);
+
 
     m.def("save_files_collection_to_file", &saveFilesCollectionToFile,
           "file_name"_a, "files_names"_a, "files_descriptions"_a);

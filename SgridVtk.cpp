@@ -96,9 +96,17 @@ void Sgrid::save(const std::string &fileName, const std::string &type) {
             array->SetArray(_facesArrays.at(ent.first).data(), _facesN, 1);
             unstructuredGrid->GetCellData()->AddArray(array);
         }
-
     }
 
+
+    for (auto &ent : _pointsArrays) {
+        auto array = vtkSmartPointer<vtkDoubleArray>::New();
+        array->SetNumberOfComponents(1);
+        array->SetNumberOfTuples(_pointsN);
+        array->SetName(ent.first.c_str());
+        array->SetArray(_pointsArrays.at(ent.first).data(), _pointsN, 1);
+        unstructuredGrid->GetPointData()->AddArray(array);
+    }
 
     auto unstructuredGridWriter = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     unstructuredGridWriter->SetFileName(fileName.c_str());

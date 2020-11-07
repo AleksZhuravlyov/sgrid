@@ -91,6 +91,8 @@ public:
 
     void calculateNodesCoordinates();
 
+    void calculatePointsNodes();
+
     void calculateCellsNodes();
 
     void calculateFacesDimss();
@@ -157,6 +159,8 @@ public:
 
     std::vector<double> _nodesCoordinates;
 
+    std::map<uint64_t, std::vector<uint64_t>> _pointsNodes;
+
     std::vector<uint16_t> _cellsDims;
     uint64_t _cellsN;
     std::map<uint64_t, std::vector<uint64_t>> _cellsNodes;
@@ -180,7 +184,6 @@ public:
     std::map<std::string, Eigen::Map<Eigen::VectorXd>> _pointsArrays;
     std::map<std::string, Eigen::Map<Eigen::VectorXd>> _cellsArrays;
     std::map<std::string, Eigen::Map<Eigen::VectorXd>> _facesArrays;
-
 
 };
 
