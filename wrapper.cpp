@@ -100,7 +100,10 @@ PYBIND11_MODULE(sgrid_bind, m) {
             .def_property("cells_arrays", &Sgrid::getCellsArrays,
                           &Sgrid::setCellsArrays)
             .def_property("faces_arrays", &Sgrid::getFacesArrays,
-                          &Sgrid::setFacesArrays);
+                          &Sgrid::setFacesArrays)
+
+            .def_property("cells_conditions", &Sgrid::getCellsConditions,
+                          &Sgrid::setCellsConditions);
 
 
     m.def("save_files_collection_to_file", &saveFilesCollectionToFile,

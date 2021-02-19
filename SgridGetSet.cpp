@@ -104,3 +104,12 @@ void Sgrid::setFacesArrays(
         std::map<std::string, Eigen::Ref<Eigen::VectorXd>> facesArrays) {
     Eigen::mapSetter<std::string, Eigen::VectorXd>(facesArrays, _facesArrays);
 }
+
+std::map<std::string, Eigen::Ref<Eigen::VectorXb>> Sgrid::getCellsConditions() {
+    return Eigen::mapGetter<std::string, Eigen::VectorXb>(_cellsConditions);
+}
+
+void Sgrid::setCellsConditions(
+        std::map<std::string, Eigen::Ref<Eigen::VectorXb>> cellsConditions) {
+    Eigen::mapSetter<std::string, Eigen::VectorXb>(cellsConditions, _cellsConditions);
+}

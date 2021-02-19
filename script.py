@@ -36,13 +36,18 @@ spacing = [1., 1., 1.]
 
 sgrid = Sgrid(points_dims, points_origin, spacing)
 
+points_arrays = {'points': np.arange(sgrid.points_N, dtype=np.float64)}
 cells_arrays = {'sells': np.arange(sgrid.cells_N, dtype=np.float64)}
 faces_arrays = {'faces': np.arange(sgrid.faces_N, dtype=np.float64)}
-points_arrays = {'points': np.arange(sgrid.points_N, dtype=np.float64)}
 
+is_condition = np.random.randint(2, size=sgrid.points_N, dtype=np.bool)
+cells_conditions = {'is_condition': is_condition}
+
+sgrid.points_arrays = points_arrays
 sgrid.cells_arrays = cells_arrays
 sgrid.faces_arrays = faces_arrays
-sgrid.points_arrays = points_arrays
+
+sgrid.cells_conditions = cells_conditions
 
 print('points_dims', sgrid.points_dims)
 print('points_N', sgrid.points_N)
@@ -70,6 +75,8 @@ print()
 print('points_arrays', sgrid.points_arrays)
 print('cells_arrays', sgrid.cells_arrays)
 print('faces_arrays', sgrid.faces_arrays)
+print()
+print('cells_conditions', sgrid.cells_conditions)
 print()
 active_cells = np.arange(sgrid.cells_N, dtype=np.uint64)
 sgrid.set_cells_type('active', active_cells)

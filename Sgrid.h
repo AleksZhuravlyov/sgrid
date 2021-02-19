@@ -34,6 +34,7 @@
 
 namespace Eigen {
     typedef Eigen::Matrix<uint64_t, Eigen::Dynamic, 1> VectorXui64;
+    typedef Eigen::Matrix<bool, Eigen::Dynamic, 1> VectorXb;
 }
 
 class Sgrid {
@@ -150,6 +151,11 @@ public:
     void setFacesArrays(std::map<std::string, Eigen::Ref<Eigen::VectorXd>> facesArrays);
 
 
+    std::map<std::string, Eigen::Ref<Eigen::VectorXb>> getCellsConditions();
+
+    void setCellsConditions(std::map<std::string, Eigen::Ref<Eigen::VectorXb>> cellsConditions);
+
+
     /// Attributes
 
     std::vector<uint16_t> _pointsDims;
@@ -184,6 +190,8 @@ public:
     std::map<std::string, Eigen::Map<Eigen::VectorXd>> _pointsArrays;
     std::map<std::string, Eigen::Map<Eigen::VectorXd>> _cellsArrays;
     std::map<std::string, Eigen::Map<Eigen::VectorXd>> _facesArrays;
+
+    std::map<std::string, Eigen::Map<Eigen::VectorXb>> _cellsConditions;
 
 };
 
