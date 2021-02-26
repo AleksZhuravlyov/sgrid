@@ -111,7 +111,8 @@ void Sgrid::save(const std::string &fileName, const std::string &type) {
     auto unstructuredGridWriter = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     unstructuredGridWriter->SetFileName(fileName.c_str());
     unstructuredGridWriter->SetInputData(unstructuredGrid);
-    unstructuredGridWriter->SetDataModeToAscii();
+    // Made for testing
+    // unstructuredGridWriter->SetDataModeToAscii();
     unstructuredGridWriter->Write();
 
 
